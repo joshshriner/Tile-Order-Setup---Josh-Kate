@@ -1,584 +1,568 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tile Order Builder — Wilde Holdings</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: #0f0f0f; color: #e8e8e8; min-height: 100vh; }
+  .app { max-width: 700px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  .header { border-bottom: 1px solid #2a2a2a; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .header-left h1 { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #4ade80; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+  .header-left p { font-size: 12px; color: #555; font-family: 'IBM Plex Mono', monospace; }
+  .phase-badge { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; background: #0d2010; border: 1px solid #166534; border-radius: 4px; padding: 4px 10px; }
+
+  .phase-tabs { display: flex; gap: 4px; margin-bottom: 24px; background: #111; border-radius: 8px; padding: 4px; }
+  .phase-tab { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 8px 6px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .phase-tab.inactive { background: none; color: #444; }
+  .phase-tab.inactive:hover { color: #888; }
+  .phase-tab.active { background: #1a1a1a; color: #4ade80; border: 1px solid #2a2a2a; }
+  .phase-tab.done { background: none; color: #166534; cursor: pointer; }
+
+  .step-header { margin-bottom: 20px; }
+  .step-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .step-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .step-sub { font-size: 13px; color: #555; }
+
+  .setup-card { background: #141414; border: 1px solid #222; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+  .setup-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; user-select: none; }
+  .setup-card-header:hover { background: #181818; }
+  .setup-card-label { font-size: 13px; font-weight: 500; color: #ccc; }
+  .setup-card-sku { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #555; background: #1a1a1a; padding: 3px 8px; border-radius: 4px; }
+  .setup-card-sku.filled { color: #4ade80; background: #0d1f12; border: 1px solid #166534; }
+  .setup-card-sku.skipped-badge { color: #ef4444; background: #1a0808; border: 1px solid #3f1010; }
+  .setup-card-toggle { font-size: 11px; color: #444; transition: transform 0.2s; margin-left: 8px; }
+  .setup-card-toggle.open { transform: rotate(90deg); }
+  .setup-card-body { padding: 0 16px 14px; border-top: 1px solid #1a1a1a; display: none; }
+  .setup-card-body.open { display: block; padding-top: 12px; }
+  .skipped-overlay { opacity: 0.45; pointer-events: none; }
+
+  .field-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .field-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
+  .field-group.sku-field { flex: 0 0 150px; }
+  .field-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.08em; text-transform: uppercase; }
+  .req { color: #ef4444; }
+  .field-input { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 8px 10px; outline: none; width: 100%; transition: border-color 0.2s; }
+  .field-input:focus { border-color: #4ade80; }
+  .field-input.mono { font-family: 'IBM Plex Mono', monospace; }
+  .field-input.has-value { border-color: #166534; }
+
+  .skip-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 0 2px; border-top: 1px solid #1a1a1a; margin-top: 4px; }
+  .skip-toggle label { font-size: 12px; color: #666; cursor: pointer; }
+  .skip-toggle input[type=checkbox] { accent-color: #ef4444; width: 14px; height: 14px; cursor: pointer; }
+
+  .room-header { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.12em; text-transform: uppercase; padding: 16px 0 8px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 6px; }
+  .room-header:first-child { margin-top: 0; }
+
+  .order-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 16px; margin-bottom: 8px; }
+  .order-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 12px; }
+  .order-item-label { font-size: 14px; font-weight: 500; color: #e8e8e8; }
+  .order-item-name { font-size: 12px; color: #666; margin-top: 2px; }
+  .order-sku-badge { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; background: #0d1f12; border: 1px solid #166534; padding: 3px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+  .order-controls { display: flex; gap: 10px; align-items: center; }
+  .qty-label { font-size: 12px; color: #888; white-space: nowrap; }
+  .qty-input { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 14px; padding: 8px 10px; width: 100px; outline: none; transition: border-color 0.2s; }
+  .qty-input:focus { border-color: #4ade80; }
+  .qty-input.has-value { border-color: #166534; background: #0d1f12; color: #4ade80; }
+
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }
+  .btn { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; padding: 12px 24px; border-radius: 8px; cursor: pointer; border: none; transition: all 0.2s; letter-spacing: 0.05em; }
+  .btn-back { background: #1a1a1a; color: #888; border: 1px solid #2a2a2a; }
+  .btn-back:hover { background: #222; color: #ccc; }
+  .btn-next { background: #4ade80; color: #0a1f0f; font-weight: 600; }
+  .btn-next:hover { background: #22c55e; }
+
+  .summary-room { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 0 6px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 16px; }
+  .summary-room:first-child { margin-top: 0; }
+  .summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #111; gap: 12px; }
+  .summary-item-name { font-size: 13px; color: #ccc; }
+  .summary-item-sku { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #555; margin-top: 2px; }
+  .summary-qty { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #4ade80; font-weight: 600; white-space: nowrap; }
+
+  .note-box { background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .note-box label { display: block; font-size: 10px; color: #555; margin-bottom: 8px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+  .note-box input, .note-box textarea { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; padding: 10px; outline: none; resize: vertical; transition: border-color 0.2s; }
+  .note-box input:focus, .note-box textarea:focus { border-color: #4ade80; }
+
+  .action-row { display: flex; gap: 10px; margin-top: 8px; }
+  .copy-btn { flex: 1; background: #1e1e1e; color: #aaa; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; padding: 13px; border: 1px solid #2a2a2a; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .copy-btn:hover { background: #252525; color: #ccc; }
+  .copy-btn.copied { background: #0d1f12; color: #4ade80; border-color: #166534; }
+  .pdf-btn { flex: 1; background: #4ade80; color: #0a1f0f; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 13px; border: none; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+  .pdf-btn:hover { background: #22c55e; }
+
+  .restart-btn { width: 100%; background: none; color: #555; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 12px; border: 1px solid #222; border-radius: 8px; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
+  .restart-btn:hover { color: #888; border-color: #333; }
+  .empty-state { text-align: center; padding: 40px 0; color: #444; font-size: 13px; }
+
+  /* ── PRINT FRAME (hidden on screen) ── */
+  #print-frame { display: none; }
+
+  /* ── PRINT STYLES ── */
+  @media print {
+    body > .app { display: none !important; }
+    #print-frame {
+      display: block !important;
+      font-family: 'IBM Plex Sans', Arial, sans-serif;
+      font-size: 11pt;
+      color: #111;
+      padding: 0.5in 0.6in;
+    }
+
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    .pf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2.5pt solid #111;
+      padding-bottom: 12pt;
+      margin-bottom: 18pt;
+    }
+    .pf-company {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 16pt;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #111;
+      margin-bottom: 3pt;
+    }
+    .pf-tagline {
+      font-size: 8pt;
+      color: #888;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .pf-meta { text-align: right; }
+    .pf-meta-label { font-size: 7.5pt; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1pt; }
+    .pf-meta-value { font-size: 11pt; font-weight: 600; color: #111; margin-bottom: 5pt; }
+
+    .pf-project {
+      background: #f4f4f4;
+      border-left: 4pt solid #222;
+      padding: 9pt 12pt;
+      margin-bottom: 18pt;
+      border-radius: 0 3pt 3pt 0;
+    }
+    .pf-project-label { font-size: 7.5pt; color: #999; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2pt; }
+    .pf-project-name { font-size: 13pt; font-weight: 700; color: #111; }
+
+    .pf-room-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #fff;
+      background: #1a1a1a;
+      padding: 5pt 10pt;
+      margin: 14pt 0 0;
+      border-radius: 2pt 2pt 0 0;
+    }
+
+    .pf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+    }
+    .pf-table thead tr { background: #efefef; }
+    .pf-table th {
+      font-size: 7.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #777;
+      padding: 5pt 9pt;
+      text-align: left;
+      border-bottom: 1pt solid #ddd;
+    }
+    .pf-table th.r { text-align: right; }
+    .pf-table td { padding: 7pt 9pt; border-bottom: 1pt solid #eee; vertical-align: middle; }
+    .pf-table tr:last-child td { border-bottom: none; }
+    .pf-table tr.even { background: #fafafa; }
+
+    .pf-item-label { font-weight: 600; font-size: 10pt; color: #111; }
+    .pf-item-desc { font-size: 8.5pt; color: #888; margin-top: 1pt; }
+    .pf-sku {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9pt;
+      color: #333;
+      background: #efefef;
+      padding: 2pt 6pt;
+      border-radius: 2pt;
+    }
+    .pf-qty { font-family: 'IBM Plex Mono', monospace; font-size: 11pt; font-weight: 700; text-align: right; color: #111; }
+    .pf-unit { font-size: 8.5pt; font-weight: 400; color: #888; }
+
+    .pf-notes { margin-top: 18pt; border-top: 1pt solid #ddd; padding-top: 12pt; }
+    .pf-notes-label { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 5pt; }
+    .pf-notes-text { font-size: 10pt; color: #333; line-height: 1.5; }
+
+    .pf-footer {
+      margin-top: 24pt;
+      border-top: 1pt solid #eee;
+      padding-top: 8pt;
+      display: flex;
+      justify-content: space-between;
+      color: #bbb;
+      font-size: 8pt;
+    }
+  }
+</style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1">&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1">&lt;title&gt;Tile Order Builder — Wilde Holdings&lt;/title&gt;</p>
-<p class="p1">&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@300;400;500;600&amp;display=swap');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>* { box-sizing: border-box; margin: 0; padding: 0; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>body { font-family: 'IBM Plex Sans', sans-serif; background: #0f0f0f; color: #e8e8e8; min-height: 100vh; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.app { max-width: 700px; margin: 0 auto; padding: 24px 16px 80px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.header { border-bottom: 1px solid #2a2a2a; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.header-left h1 { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #4ade80; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.header-left p { font-size: 12px; color: #555; font-family: 'IBM Plex Mono', monospace; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.phase-badge { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; background: #0d2010; border: 1px solid #166534; border-radius: 4px; padding: 4px 10px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.phase-tabs { display: flex; gap: 4px; margin-bottom: 24px; background: #111; border-radius: 8px; padding: 4px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.phase-tab { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 8px 6px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-align: center; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.phase-tab.inactive { background: none; color: #444; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.phase-tab.inactive:hover { color: #888; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.phase-tab.active { background: #1a1a1a; color: #4ade80; border: 1px solid #2a2a2a; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.phase-tab.done { background: none; color: #166534; cursor: pointer; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.step-header { margin-bottom: 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.step-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.08em; margin-bottom: 4px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.step-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.step-sub { font-size: 13px; color: #555; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card { background: #141414; border: 1px solid #222; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; user-select: none; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-header:hover { background: #181818; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-label { font-size: 13px; font-weight: 500; color: #ccc; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-sku { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #555; background: #1a1a1a; padding: 3px 8px; border-radius: 4px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-sku.filled { color: #4ade80; background: #0d1f12; border: 1px solid #166534; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-sku.skipped-badge { color: #ef4444; background: #1a0808; border: 1px solid #3f1010; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-toggle { font-size: 11px; color: #444; transition: transform 0.2s; margin-left: 8px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-toggle.open { transform: rotate(90deg); }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-body { padding: 0 16px 14px; border-top: 1px solid #1a1a1a; display: none; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.setup-card-body.open { display: block; padding-top: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.skipped-overlay { opacity: 0.45; pointer-events: none; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.field-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.field-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.field-group.sku-field { flex: 0 0 150px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.field-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.08em; text-transform: uppercase; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.req { color: #ef4444; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.field-input { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 8px 10px; outline: none; width: 100%; transition: border-color 0.2s; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.field-input:focus { border-color: #4ade80; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.field-input.mono { font-family: 'IBM Plex Mono', monospace; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.field-input.has-value { border-color: #166534; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.skip-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 0 2px; border-top: 1px solid #1a1a1a; margin-top: 4px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.skip-toggle label { font-size: 12px; color: #666; cursor: pointer; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.skip-toggle input[type=checkbox] { accent-color: #ef4444; width: 14px; height: 14px; cursor: pointer; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.room-header { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.12em; text-transform: uppercase; padding: 16px 0 8px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 6px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.room-header:first-child { margin-top: 0; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.order-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 16px; margin-bottom: 8px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.order-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.order-item-label { font-size: 14px; font-weight: 500; color: #e8e8e8; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.order-item-name { font-size: 12px; color: #666; margin-top: 2px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.order-sku-badge { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; background: #0d1f12; border: 1px solid #166534; padding: 3px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.order-controls { display: flex; gap: 10px; align-items: center; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.qty-label { font-size: 12px; color: #888; white-space: nowrap; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.qty-input { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 14px; padding: 8px 10px; width: 100px; outline: none; transition: border-color 0.2s; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.qty-input:focus { border-color: #4ade80; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.qty-input.has-value { border-color: #166534; background: #0d1f12; color: #4ade80; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.btn { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; padding: 12px 24px; border-radius: 8px; cursor: pointer; border: none; transition: all 0.2s; letter-spacing: 0.05em; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.btn-back { background: #1a1a1a; color: #888; border: 1px solid #2a2a2a; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.btn-back:hover { background: #222; color: #ccc; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.btn-next { background: #4ade80; color: #0a1f0f; font-weight: 600; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.btn-next:hover { background: #22c55e; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.summary-room { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 0 6px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 16px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.summary-room:first-child { margin-top: 0; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #111; gap: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.summary-item-name { font-size: 13px; color: #ccc; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.summary-item-sku { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #555; margin-top: 2px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.summary-qty { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #4ade80; font-weight: 600; white-space: nowrap; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.note-box { background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; margin-bottom: 14px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.note-box label { display: block; font-size: 10px; color: #555; margin-bottom: 8px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.note-box input, .note-box textarea { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; padding: 10px; outline: none; resize: vertical; transition: border-color 0.2s; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.note-box input:focus, .note-box textarea:focus { border-color: #4ade80; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.action-row { display: flex; gap: 10px; margin-top: 8px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.copy-btn { flex: 1; background: #1e1e1e; color: #aaa; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; padding: 13px; border: 1px solid #2a2a2a; border-radius: 8px; cursor: pointer; transition: all 0.2s; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.copy-btn:hover { background: #252525; color: #ccc; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.copy-btn.copied { background: #0d1f12; color: #4ade80; border-color: #166534; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.pdf-btn { flex: 1; background: #4ade80; color: #0a1f0f; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 13px; border: none; border-radius: 8px; cursor: pointer; transition: background 0.2s; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.pdf-btn:hover { background: #22c55e; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>.restart-btn { width: 100%; background: none; color: #555; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 12px; border: 1px solid #222; border-radius: 8px; cursor: pointer; margin-top: 8px; transition: all 0.2s; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.restart-btn:hover { color: #888; border-color: #333; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.empty-state { text-align: center; padding: 40px 0; color: #444; font-size: 13px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>/* ── PRINT FRAME (hidden on screen) ── */</p>
-<p class="p1"><span class="Apple-converted-space">  </span>#print-frame { display: none; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>/* ── PRINT STYLES ── */</p>
-<p class="p1"><span class="Apple-converted-space">  </span>@media print {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>body &gt; .app { display: none !important; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>#print-frame {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: block !important;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: 'IBM Plex Sans', Arial, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 11pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #111;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 0.5in 0.6in;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-header {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: flex-start;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom: 2.5pt solid #111;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding-bottom: 12pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 18pt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-company {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: 'IBM Plex Mono', monospace;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 16pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.04em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #111;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 3pt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-tagline {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 8pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #888;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.1em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-meta { text-align: right; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-meta-label { font-size: 7.5pt; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1pt; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-meta-value { font-size: 11pt; font-weight: 600; color: #111; margin-bottom: 5pt; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-project {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: #f4f4f4;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-left: 4pt solid #222;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 9pt 12pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 18pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 0 3pt 3pt 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-project-label { font-size: 7.5pt; color: #999; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2pt; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-project-name { font-size: 13pt; font-weight: 700; color: #111; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-room-label {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: 'IBM Plex Mono', monospace;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 8pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.15em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #fff;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: #1a1a1a;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 5pt 10pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin: 14pt 0 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 2pt 2pt 0 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-table {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-collapse: collapse;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 10pt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-table thead tr { background: #efefef; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-table th {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 7.5pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.08em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #777;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 5pt 9pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-align: left;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom: 1pt solid #ddd;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-table th.r { text-align: right; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-table td { padding: 7pt 9pt; border-bottom: 1pt solid #eee; vertical-align: middle; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-table tr:last-child td { border-bottom: none; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-table tr.even { background: #fafafa; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-item-label { font-weight: 600; font-size: 10pt; color: #111; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-item-desc { font-size: 8.5pt; color: #888; margin-top: 1pt; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-sku {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: 'IBM Plex Mono', monospace;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 9pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #333;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: #efefef;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 2pt 6pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 2pt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-qty { font-family: 'IBM Plex Mono', monospace; font-size: 11pt; font-weight: 700; text-align: right; color: #111; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-unit { font-size: 8.5pt; font-weight: 400; color: #888; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-notes { margin-top: 18pt; border-top: 1pt solid #ddd; padding-top: 12pt; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-notes-label { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 5pt; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-notes-text { font-size: 10pt; color: #333; line-height: 1.5; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.pf-footer {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 24pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-top: 1pt solid #eee;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding-top: 8pt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #bbb;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 8pt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div id="print-frame"&gt;&lt;/div&gt;</p>
-<p class="p1">&lt;div class="app" id="app"&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1">const DEFAULT_ROOMS = [</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>id: 'hall_bath', name: 'Hall Bathroom',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'hb_fl_tile',<span class="Apple-converted-space">    </span>label: 'Floor Tile', <span class="Apple-converted-space">          </span>name: 'Cashmere Mixed Finish Penny Mosaic', desc: 'Beige penny tile', <span class="Apple-converted-space">      </span>sku: '100966589', unit: 'sqft' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'hb_fl_grout', <span class="Apple-converted-space">  </span>label: 'Floor Grout',<span class="Apple-converted-space">          </span>name: 'Mapei 5093 Warm Gray Grout', <span class="Apple-converted-space">        </span>desc: 'Grout color: warm gray', sku: '100221415', unit: 'bags' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'hb_sh_tile',<span class="Apple-converted-space">    </span>label: 'Shower Surround Tile', name: 'Green Rectangle Zellige Tile',<span class="Apple-converted-space">        </span>desc: 'Vertical stack', <span class="Apple-converted-space">        </span>sku: '101317071', unit: 'sqft' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'hb_sh_grout', <span class="Apple-converted-space">  </span>label: 'Shower Grout', <span class="Apple-converted-space">        </span>name: 'Mapei 5010 Black Grout', <span class="Apple-converted-space">            </span>desc: 'Grout color: black', <span class="Apple-converted-space">    </span>sku: '100221266', unit: 'bags' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'hb_sh_trim',<span class="Apple-converted-space">    </span>label: 'Shower Schluter Trim', name: 'Schluter Schiene 3/8in',<span class="Apple-converted-space">              </span>desc: 'Matte black',<span class="Apple-converted-space">            </span>sku: '100840685', unit: 'pcs'<span class="Apple-converted-space">  </span>},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>]</p>
-<p class="p1"><span class="Apple-converted-space">  </span>},</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>id: 'primary_bath', name: 'Primary Bathroom',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'pb_fl_tile',<span class="Apple-converted-space">    </span>label: 'Floor Tile', <span class="Apple-converted-space">            </span>name: 'Cashmere Mixed Finish Penny Mosaic', desc: 'Beige penny tile', <span class="Apple-converted-space">      </span>sku: '101301588', unit: 'sqft' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'pb_fl_grout', <span class="Apple-converted-space">  </span>label: 'Floor Grout',<span class="Apple-converted-space">            </span>name: 'Mapei 5093 Warm Gray Grout', <span class="Apple-converted-space">        </span>desc: 'Grout color: warm gray', sku: '100895432', unit: 'bags' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'pb_shfl_tile',<span class="Apple-converted-space">  </span>label: 'Shower Floor Tile',<span class="Apple-converted-space">      </span>name: 'Cashmere Mixed Finish Penny Mosaic', desc: 'Beige penny tile', <span class="Apple-converted-space">      </span>sku: '100966589', unit: 'sqft' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'pb_shfl_grout', label: 'Shower Floor Grout', <span class="Apple-converted-space">    </span>name: 'Mapei 5093 Warm Gray Grout', <span class="Apple-converted-space">        </span>desc: 'Grout color: warm gray', sku: '100221415', unit: 'bags' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'pb_sh_tile',<span class="Apple-converted-space">    </span>label: 'Shower Surround Tile', <span class="Apple-converted-space">  </span>name: 'Cashmere Glossy Ceramic Tile', <span class="Apple-converted-space">      </span>desc: 'Vertical stack', <span class="Apple-converted-space">        </span>sku: '101068427', unit: 'sqft' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'pb_sh_grout', <span class="Apple-converted-space">  </span>label: 'Shower Surround Grout',<span class="Apple-converted-space">  </span>name: 'Mapei 5093 Warm Gray Grout', <span class="Apple-converted-space">        </span>desc: 'Grout color: warm gray', sku: '100221415', unit: 'bags' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'pb_sh_trim',<span class="Apple-converted-space">    </span>label: 'Shower Schluter Trim', <span class="Apple-converted-space">  </span>name: 'Schluter Schiene 3/8in',<span class="Apple-converted-space">              </span>desc: 'Satin brass',<span class="Apple-converted-space">            </span>sku: '100840644', unit: 'pcs'<span class="Apple-converted-space">  </span>},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>]</p>
-<p class="p1"><span class="Apple-converted-space">  </span>},</p>
-<p class="p1"><span class="Apple-converted-space">  </span>{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>id: 'kitchen', name: 'Kitchen',</p>
-<p class="p1"><span class="Apple-converted-space">    </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'k_bs_tile',<span class="Apple-converted-space">  </span>label: 'Backsplash Tile',<span class="Apple-converted-space">          </span>name: 'Zellige Perla Polished Ceramic Tile', desc: 'Modern stack', sku: '100776624', unit: 'sqft' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'k_bs_grout', label: 'Backsplash Grout', <span class="Apple-converted-space">        </span>name: 'Mapei 5038 Avalanche Grout',<span class="Apple-converted-space">          </span>desc: 'Avalanche',<span class="Apple-converted-space">    </span>sku: '100221332', unit: 'bags' },</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ id: 'k_bs_trim',<span class="Apple-converted-space">  </span>label: 'Backsplash Schluter Trim', name: 'Schluter Schiene Edge Trim 3/8in',<span class="Apple-converted-space">    </span>desc: 'White',<span class="Apple-converted-space">        </span>sku: '951501138', unit: 'pcs'<span class="Apple-converted-space">  </span>},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>]</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">];</p>
-<p class="p2"><br></p>
-<p class="p1">let phase = 'setup';</p>
-<p class="p1">let openCards = {};</p>
-<p class="p1">let rooms = [];</p>
-<p class="p1">let edits = {};</p>
-<p class="p1">let quantities = {};</p>
-<p class="p1">let projectName = '';</p>
-<p class="p1">let notes = '';</p>
-<p class="p1">let copied = false;</p>
-<p class="p2"><br></p>
-<p class="p1">function initState() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>rooms = JSON.parse(JSON.stringify(DEFAULT_ROOMS));</p>
-<p class="p1"><span class="Apple-converted-space">  </span>edits = {}; quantities = {}; openCards = {};</p>
-<p class="p1"><span class="Apple-converted-space">  </span>rooms.forEach(r =&gt; r.items.forEach(i =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>edits[i.id] = { name: i.name, desc: i.desc, sku: i.sku, skipped: false };</p>
-<p class="p1"><span class="Apple-converted-space">    </span>quantities[i.id] = '';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>openCards[i.id] = false;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}));</p>
-<p class="p1">}</p>
-<p class="p1">initState();</p>
-<p class="p2"><br></p>
-<p class="p1">function render() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const app = document.getElementById('app');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>app.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="header-left"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;Tile Order Builder&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;Wilde Holdings — Material Order&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="phase-badge"&gt;${phase === 'setup' ? 'SETUP' : phase === 'order' ? 'ORDER' : 'SUMMARY'}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="phase-tabs"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="phase-tab ${phase==='setup'?'active':(phase==='order'||phase==='summary')?'done':'inactive'}"</p>
-<p class="p1"><span class="Apple-converted-space">        </span>onclick="if(phase!=='setup'){phase='setup';render();window.scrollTo(0,0)}"&gt;1 · Configure SKUs&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="phase-tab ${phase==='order'?'active':phase==='summary'?'done':'inactive'}"</p>
-<p class="p1"><span class="Apple-converted-space">        </span>onclick="if(phase==='summary'){phase='order';render();window.scrollTo(0,0)}"&gt;2 · Enter Quantities&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="phase-tab ${phase==='summary'?'active':'inactive'}"&gt;3 · Summary&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (phase === 'setup') renderSetup(app);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>else if (phase === 'order') renderOrder(app);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>else renderSummary(app);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function renderSetup(app) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let html = `</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="step-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="step-label"&gt;PHASE 1 — PROJECT SETUP&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="step-title"&gt;Configure This Job&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="step-sub"&gt;Edit product name, description, and SKU for each item. Skip anything not needed on this job.&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="note-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;Project / Address&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="text" placeholder="e.g. 501 S 24th St Broken Arrow" value="${projectName}" oninput="projectName=this.value" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>rooms.forEach(room =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>html += `&lt;div class="room-header"&gt;${room.name}&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>room.items.forEach(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const e = edits[item.id];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const isOpen = openCards[item.id];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const hasSku = e.sku.trim() !== '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>html += `</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="setup-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="setup-card-header" onclick="openCards['${item.id}']=!openCards['${item.id}'];render()"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="setup-card-label"&gt;${item.label}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="display:flex;align-items:center;gap:8px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;span class="setup-card-sku ${e.skipped?'skipped-badge':hasSku?'filled':''}"&gt;${e.skipped?'SKIP':hasSku?e.sku:'NO SKU'}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;span class="setup-card-toggle ${isOpen?'open':''}"&gt;▶&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="setup-card-body ${isOpen?'open':''}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="${e.skipped?'skipped-overlay':''}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="field-row"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="field-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;span class="field-label"&gt;Product Name&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;input class="field-input ${e.name?'has-value':''}" type="text" placeholder="Product name"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>value="${e.name.replace(/"/g,'&amp;quot;')}"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>oninput="edits['${item.id}'].name=this.value" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="field-row"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="field-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;span class="field-label"&gt;Description / Color&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;input class="field-input ${e.desc?'has-value':''}" type="text" placeholder="e.g. Matte black, vertical stack"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>value="${e.desc.replace(/"/g,'&amp;quot;')}"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>oninput="edits['${item.id}'].desc=this.value" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="field-group sku-field"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;span class="field-label"&gt;SKU &lt;span class="req"&gt;*&lt;/span&gt;&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;input class="field-input mono ${e.sku?'has-value':''}" type="text" placeholder="Required"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>value="${e.sku}"</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>oninput="edits['${item.id}'].sku=this.value" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="skip-toggle"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;input type="checkbox" id="skip-${item.id}" ${e.skipped?'checked':''} onchange="edits['${item.id}'].skipped=this.checked;render()" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;label for="skip-${item.id}"&gt;Skip this item for this project&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>html += `&lt;div class="nav"&gt;&lt;div&gt;&lt;/div&gt;&lt;button class="btn btn-next" onclick="phase='order';render();window.scrollTo(0,0)"&gt;Start Order →&lt;/button&gt;&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>app.insertAdjacentHTML('beforeend', html);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function renderOrder(app) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let html = `</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="step-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="step-label"&gt;PHASE 2 — QUANTITIES&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="step-title"&gt;Enter Quantities&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="step-sub"&gt;Fill in what you need. Skipped items are excluded.&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>rooms.forEach(room =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const active = room.items.filter(i =&gt; !edits[i.id].skipped);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if (!active.length) return;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>html += `&lt;div class="room-header"&gt;${room.name}&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>active.forEach(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const e = edits[item.id];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const qty = quantities[item.id];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const unitLabel = item.unit === 'sqft' ? 'Sq Ft' : item.unit === 'bags' ? 'Bags' : 'Pieces';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>html += `</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="order-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="order-card-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="order-item-label"&gt;${item.label}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="order-item-name"&gt;${e.name}${e.desc?' — '+e.desc:''}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="order-sku-badge"&gt;SKU: ${e.sku||'—'}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="order-controls"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="qty-label"&gt;${unitLabel}:&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;input class="qty-input ${qty!==''?'has-value':''}" type="number" min="0" placeholder="0" value="${qty}"</p>
-<p class="p1"><span class="Apple-converted-space">              </span>oninput="quantities['${item.id}']=this.value;this.classList.toggle('has-value',this.value!=='')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>html += `</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="nav"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn btn-back" onclick="phase='setup';render();window.scrollTo(0,0)"&gt;← Back&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn btn-next" onclick="phase='summary';render();window.scrollTo(0,0)"&gt;Review Order →&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>app.insertAdjacentHTML('beforeend', html);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function renderSummary(app) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let hasItems = false;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let summaryRows = '';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>rooms.forEach(room =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const orderItems = room.items.filter(i =&gt; !edits[i.id].skipped &amp;&amp; quantities[i.id] !== '' &amp;&amp; Number(quantities[i.id]) &gt; 0);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if (!orderItems.length) return;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>hasItems = true;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>summaryRows += `&lt;div class="summary-room"&gt;${room.name}&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>orderItems.forEach(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const e = edits[item.id];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>summaryRows += `</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="summary-row"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="summary-item-name"&gt;${item.label} — ${e.name}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="summary-item-sku"&gt;SKU: ${e.sku}${e.desc?' · '+e.desc:''}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="summary-qty"&gt;${quantities[item.id]} ${item.unit}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>let html = `</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="step-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="step-label"&gt;PHASE 3 — SUMMARY&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="step-title"&gt;Order Review&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="step-sub"&gt;Review, add notes, then copy or download as PDF.&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="note-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;Project / Address&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="text" placeholder="e.g. 501 S 24th St Broken Arrow" value="${projectName}" oninput="projectName=this.value" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>${hasItems ? summaryRows : '&lt;div class="empty-state"&gt;No items with quantities entered.&lt;br&gt;Go back and add some.&lt;/div&gt;'}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="note-box" style="margin-top:16px"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;Notes for Rep&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;textarea rows="3" placeholder="Any special instructions..." oninput="notes=this.value"&gt;${notes}&lt;/textarea&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="nav" style="margin-top:0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn btn-back" onclick="phase='order';render();window.scrollTo(0,0)"&gt;← Edit&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>${hasItems ? `</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="action-row"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="copy-btn ${copied?'copied':''}" onclick="copyOrder()"&gt;${copied?'✓ Copied':'Copy Text'}&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="pdf-btn" onclick="generatePDF()"&gt;⬇ Download PDF&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>` : ''}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="restart-btn" onclick="restartAll()"&gt;Start New Order&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>app.insertAdjacentHTML('beforeend', html);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function copyOrder() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const lines = ['WILDE HOLDINGS — TILE ORDER'];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (projectName) lines.push('PROJECT: ' + projectName);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>lines.push('DATE: ' + date, '');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>rooms.forEach(room =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const items = room.items.filter(i =&gt; !edits[i.id].skipped &amp;&amp; quantities[i.id] !== '' &amp;&amp; Number(quantities[i.id]) &gt; 0);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if (!items.length) return;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>lines.push('── ' + room.name.toUpperCase() + ' ──');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>items.forEach(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const e = edits[item.id];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>lines.push(item.label + ': ' + e.name + (e.desc ? ' (' + e.desc + ')' : ''));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>lines.push('<span class="Apple-converted-space">  </span>SKU: ' + e.sku + '<span class="Apple-converted-space">  </span>|<span class="Apple-converted-space">  </span>Qty: ' + quantities[item.id] + ' ' + item.unit);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>lines.push('');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (notes.trim()) lines.push('NOTES: ' + notes.trim());</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const text = lines.join('\n');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>navigator.clipboard.writeText(text).catch(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const ta = document.createElement('textarea');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ta.value = text; document.body.appendChild(ta); ta.select();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.execCommand('copy'); document.body.removeChild(ta);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>copied = true; render();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>setTimeout(() =&gt; { copied = false; render(); }, 3000);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function generatePDF() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const date <span class="Apple-converted-space">    </span>= new Date().toLocaleDateString('en-US', { month: 'long',<span class="Apple-converted-space">  </span>day: 'numeric', year: 'numeric' });</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const dateShort= new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const unitLabel = u =&gt; u === 'sqft' ? 'sq ft' : u === 'bags' ? 'bags' : 'pcs';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>let roomsHtml = '';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>rooms.forEach(room =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const items = room.items.filter(i =&gt; !edits[i.id].skipped &amp;&amp; quantities[i.id] !== '' &amp;&amp; Number(quantities[i.id]) &gt; 0);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if (!items.length) return;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>roomsHtml += `&lt;div class="pf-room-label"&gt;${room.name}&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>roomsHtml += `</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;table class="pf-table"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;th style="width:26%"&gt;Item&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;th style="width:36%"&gt;Product&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;th style="width:18%"&gt;SKU&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;th class="r" style="width:20%"&gt;Qty&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;tbody&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>${items.map((item, idx) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const e = edits[item.id];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return `</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;tr class="${idx % 2 === 1 ? 'even' : ''}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;td&gt;&lt;div class="pf-item-label"&gt;${item.label}&lt;/div&gt;&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div&gt;${e.name}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>${e.desc ? `&lt;div class="pf-item-desc"&gt;${e.desc}&lt;/div&gt;` : ''}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;td&gt;&lt;span class="pf-sku"&gt;${e.sku}&lt;/span&gt;&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;td class="pf-qty"&gt;${quantities[item.id]} &lt;span class="pf-unit"&gt;${unitLabel(item.unit)}&lt;/span&gt;&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>}).join('')}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/tbody&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/table&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('print-frame').innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="pf-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pf-company"&gt;Wilde Holdings, LLC&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pf-tagline"&gt;Tile Material Order&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="pf-meta"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pf-meta-label"&gt;Date&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pf-meta-value"&gt;${date}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>${projectName ? `</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="pf-project"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pf-project-label"&gt;Project&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pf-project-name"&gt;${projectName}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;` : ''}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>${roomsHtml}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>${notes.trim() ? `</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="pf-notes"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pf-notes-label"&gt;Notes&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pf-notes-text"&gt;${notes.trim()}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;` : ''}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="pf-footer"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;span&gt;Wilde Holdings, LLC — Tile Order&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;span&gt;${dateShort}${projectName ? ' · ' + projectName : ''}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const oldTitle = document.title;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.title = 'Tile Order' + (projectName ? ' — ' + projectName : '') + ' — ' + dateShort;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>window.print();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>setTimeout(() =&gt; { document.title = oldTitle; }, 1500);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function restartAll() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>projectName = ''; notes = ''; copied = false; phase = 'setup';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>initState(); render(); window.scrollTo(0,0);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">render();</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<div id="print-frame"></div>
+<div class="app" id="app"></div>
+
+<script>
+const DEFAULT_ROOMS = [
+  {
+    id: 'hall_bath', name: 'Hall Bathroom',
+    items: [
+      { id: 'hb_fl_tile',    label: 'Floor Tile',           name: 'Cashmere Mixed Finish Penny Mosaic', desc: 'Beige penny tile',       sku: '100966589', unit: 'sqft' },
+      { id: 'hb_fl_grout',   label: 'Floor Grout',          name: 'Mapei 5093 Warm Gray Grout',         desc: 'Grout color: warm gray', sku: '100221415', unit: 'bags' },
+      { id: 'hb_sh_tile',    label: 'Shower Surround Tile', name: 'Green Rectangle Zellige Tile',        desc: 'Vertical stack',         sku: '101317071', unit: 'sqft' },
+      { id: 'hb_sh_grout',   label: 'Shower Grout',         name: 'Mapei 5010 Black Grout',             desc: 'Grout color: black',     sku: '100221266', unit: 'bags' },
+      { id: 'hb_sh_trim',    label: 'Shower Schluter Trim', name: 'Schluter Schiene 3/8in',              desc: 'Matte black',            sku: '100840685', unit: 'pcs'  },
+    ]
+  },
+  {
+    id: 'primary_bath', name: 'Primary Bathroom',
+    items: [
+      { id: 'pb_fl_tile',    label: 'Floor Tile',             name: 'Cashmere Mixed Finish Penny Mosaic', desc: 'Beige penny tile',       sku: '101301588', unit: 'sqft' },
+      { id: 'pb_fl_grout',   label: 'Floor Grout',            name: 'Mapei 5093 Warm Gray Grout',         desc: 'Grout color: warm gray', sku: '100895432', unit: 'bags' },
+      { id: 'pb_shfl_tile',  label: 'Shower Floor Tile',      name: 'Cashmere Mixed Finish Penny Mosaic', desc: 'Beige penny tile',       sku: '100966589', unit: 'sqft' },
+      { id: 'pb_shfl_grout', label: 'Shower Floor Grout',     name: 'Mapei 5093 Warm Gray Grout',         desc: 'Grout color: warm gray', sku: '100221415', unit: 'bags' },
+      { id: 'pb_sh_tile',    label: 'Shower Surround Tile',   name: 'Cashmere Glossy Ceramic Tile',       desc: 'Vertical stack',         sku: '101068427', unit: 'sqft' },
+      { id: 'pb_sh_grout',   label: 'Shower Surround Grout',  name: 'Mapei 5093 Warm Gray Grout',         desc: 'Grout color: warm gray', sku: '100221415', unit: 'bags' },
+      { id: 'pb_sh_trim',    label: 'Shower Schluter Trim',   name: 'Schluter Schiene 3/8in',              desc: 'Satin brass',            sku: '100840644', unit: 'pcs'  },
+    ]
+  },
+  {
+    id: 'kitchen', name: 'Kitchen',
+    items: [
+      { id: 'k_bs_tile',  label: 'Backsplash Tile',          name: 'Zellige Perla Polished Ceramic Tile', desc: 'Modern stack', sku: '100776624', unit: 'sqft' },
+      { id: 'k_bs_grout', label: 'Backsplash Grout',         name: 'Mapei 5038 Avalanche Grout',          desc: 'Avalanche',    sku: '100221332', unit: 'bags' },
+      { id: 'k_bs_trim',  label: 'Backsplash Schluter Trim', name: 'Schluter Schiene Edge Trim 3/8in',    desc: 'White',        sku: '951501138', unit: 'pcs'  },
+    ]
+  }
+];
+
+let phase = 'setup';
+let openCards = {};
+let rooms = [];
+let edits = {};
+let quantities = {};
+let projectName = '';
+let notes = '';
+let copied = false;
+
+function initState() {
+  rooms = JSON.parse(JSON.stringify(DEFAULT_ROOMS));
+  edits = {}; quantities = {}; openCards = {};
+  rooms.forEach(r => r.items.forEach(i => {
+    edits[i.id] = { name: i.name, desc: i.desc, sku: i.sku, skipped: false };
+    quantities[i.id] = '';
+    openCards[i.id] = false;
+  }));
+}
+initState();
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="header">
+      <div class="header-left">
+        <h1>Tile Order Builder</h1>
+        <p>Wilde Holdings — Material Order</p>
+      </div>
+      <div class="phase-badge">${phase === 'setup' ? 'SETUP' : phase === 'order' ? 'ORDER' : 'SUMMARY'}</div>
+    </div>
+    <div class="phase-tabs">
+      <button class="phase-tab ${phase==='setup'?'active':(phase==='order'||phase==='summary')?'done':'inactive'}"
+        onclick="if(phase!=='setup'){phase='setup';render();window.scrollTo(0,0)}">1 · Configure SKUs</button>
+      <button class="phase-tab ${phase==='order'?'active':phase==='summary'?'done':'inactive'}"
+        onclick="if(phase==='summary'){phase='order';render();window.scrollTo(0,0)}">2 · Enter Quantities</button>
+      <button class="phase-tab ${phase==='summary'?'active':'inactive'}">3 · Summary</button>
+    </div>
+  `;
+  if (phase === 'setup') renderSetup(app);
+  else if (phase === 'order') renderOrder(app);
+  else renderSummary(app);
+}
+
+function renderSetup(app) {
+  let html = `
+    <div class="step-header">
+      <div class="step-label">PHASE 1 — PROJECT SETUP</div>
+      <div class="step-title">Configure This Job</div>
+      <div class="step-sub">Edit product name, description, and SKU for each item. Skip anything not needed on this job.</div>
+    </div>
+    <div class="note-box">
+      <label>Project / Address</label>
+      <input type="text" placeholder="e.g. 501 S 24th St Broken Arrow" value="${projectName}" oninput="projectName=this.value" />
+    </div>
+  `;
+  rooms.forEach(room => {
+    html += `<div class="room-header">${room.name}</div>`;
+    room.items.forEach(item => {
+      const e = edits[item.id];
+      const isOpen = openCards[item.id];
+      const hasSku = e.sku.trim() !== '';
+      html += `
+        <div class="setup-card">
+          <div class="setup-card-header" onclick="openCards['${item.id}']=!openCards['${item.id}'];render()">
+            <span class="setup-card-label">${item.label}</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="setup-card-sku ${e.skipped?'skipped-badge':hasSku?'filled':''}">${e.skipped?'SKIP':hasSku?e.sku:'NO SKU'}</span>
+              <span class="setup-card-toggle ${isOpen?'open':''}">▶</span>
+            </div>
+          </div>
+          <div class="setup-card-body ${isOpen?'open':''}">
+            <div class="${e.skipped?'skipped-overlay':''}">
+              <div class="field-row">
+                <div class="field-group">
+                  <span class="field-label">Product Name</span>
+                  <input class="field-input ${e.name?'has-value':''}" type="text" placeholder="Product name"
+                    value="${e.name.replace(/"/g,'&quot;')}"
+                    oninput="edits['${item.id}'].name=this.value" />
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <span class="field-label">Description / Color</span>
+                  <input class="field-input ${e.desc?'has-value':''}" type="text" placeholder="e.g. Matte black, vertical stack"
+                    value="${e.desc.replace(/"/g,'&quot;')}"
+                    oninput="edits['${item.id}'].desc=this.value" />
+                </div>
+                <div class="field-group sku-field">
+                  <span class="field-label">SKU <span class="req">*</span></span>
+                  <input class="field-input mono ${e.sku?'has-value':''}" type="text" placeholder="Required"
+                    value="${e.sku}"
+                    oninput="edits['${item.id}'].sku=this.value" />
+                </div>
+              </div>
+            </div>
+            <div class="skip-toggle">
+              <input type="checkbox" id="skip-${item.id}" ${e.skipped?'checked':''} onchange="edits['${item.id}'].skipped=this.checked;render()" />
+              <label for="skip-${item.id}">Skip this item for this project</label>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  });
+  html += `<div class="nav"><div></div><button class="btn btn-next" onclick="phase='order';render();window.scrollTo(0,0)">Start Order →</button></div>`;
+  app.insertAdjacentHTML('beforeend', html);
+}
+
+function renderOrder(app) {
+  let html = `
+    <div class="step-header">
+      <div class="step-label">PHASE 2 — QUANTITIES</div>
+      <div class="step-title">Enter Quantities</div>
+      <div class="step-sub">Fill in what you need. Skipped items are excluded.</div>
+    </div>
+  `;
+  rooms.forEach(room => {
+    const active = room.items.filter(i => !edits[i.id].skipped);
+    if (!active.length) return;
+    html += `<div class="room-header">${room.name}</div>`;
+    active.forEach(item => {
+      const e = edits[item.id];
+      const qty = quantities[item.id];
+      const unitLabel = item.unit === 'sqft' ? 'Sq Ft' : item.unit === 'bags' ? 'Bags' : 'Pieces';
+      html += `
+        <div class="order-card">
+          <div class="order-card-header">
+            <div>
+              <div class="order-item-label">${item.label}</div>
+              <div class="order-item-name">${e.name}${e.desc?' — '+e.desc:''}</div>
+            </div>
+            <div class="order-sku-badge">SKU: ${e.sku||'—'}</div>
+          </div>
+          <div class="order-controls">
+            <span class="qty-label">${unitLabel}:</span>
+            <input class="qty-input ${qty!==''?'has-value':''}" type="number" min="0" placeholder="0" value="${qty}"
+              oninput="quantities['${item.id}']=this.value;this.classList.toggle('has-value',this.value!=='')" />
+          </div>
+        </div>
+      `;
+    });
+  });
+  html += `
+    <div class="nav">
+      <button class="btn btn-back" onclick="phase='setup';render();window.scrollTo(0,0)">← Back</button>
+      <button class="btn btn-next" onclick="phase='summary';render();window.scrollTo(0,0)">Review Order →</button>
+    </div>
+  `;
+  app.insertAdjacentHTML('beforeend', html);
+}
+
+function renderSummary(app) {
+  let hasItems = false;
+  let summaryRows = '';
+  rooms.forEach(room => {
+    const orderItems = room.items.filter(i => !edits[i.id].skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
+    if (!orderItems.length) return;
+    hasItems = true;
+    summaryRows += `<div class="summary-room">${room.name}</div>`;
+    orderItems.forEach(item => {
+      const e = edits[item.id];
+      summaryRows += `
+        <div class="summary-row">
+          <div>
+            <div class="summary-item-name">${item.label} — ${e.name}</div>
+            <div class="summary-item-sku">SKU: ${e.sku}${e.desc?' · '+e.desc:''}</div>
+          </div>
+          <div class="summary-qty">${quantities[item.id]} ${item.unit}</div>
+        </div>
+      `;
+    });
+  });
+
+  let html = `
+    <div class="step-header">
+      <div class="step-label">PHASE 3 — SUMMARY</div>
+      <div class="step-title">Order Review</div>
+      <div class="step-sub">Review, add notes, then copy or download as PDF.</div>
+    </div>
+    <div class="note-box">
+      <label>Project / Address</label>
+      <input type="text" placeholder="e.g. 501 S 24th St Broken Arrow" value="${projectName}" oninput="projectName=this.value" />
+    </div>
+    ${hasItems ? summaryRows : '<div class="empty-state">No items with quantities entered.<br>Go back and add some.</div>'}
+    <div class="note-box" style="margin-top:16px">
+      <label>Notes for Rep</label>
+      <textarea rows="3" placeholder="Any special instructions..." oninput="notes=this.value">${notes}</textarea>
+    </div>
+    <div class="nav" style="margin-top:0">
+      <button class="btn btn-back" onclick="phase='order';render();window.scrollTo(0,0)">← Edit</button>
+      <div></div>
+    </div>
+    ${hasItems ? `
+      <div class="action-row">
+        <button class="copy-btn ${copied?'copied':''}" onclick="copyOrder()">${copied?'✓ Copied':'Copy Text'}</button>
+        <button class="pdf-btn" onclick="generatePDF()">⬇ Download PDF</button>
+      </div>
+    ` : ''}
+    <button class="restart-btn" onclick="restartAll()">Start New Order</button>
+  `;
+  app.insertAdjacentHTML('beforeend', html);
+}
+
+function copyOrder() {
+  const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const lines = ['WILDE HOLDINGS — TILE ORDER'];
+  if (projectName) lines.push('PROJECT: ' + projectName);
+  lines.push('DATE: ' + date, '');
+  rooms.forEach(room => {
+    const items = room.items.filter(i => !edits[i.id].skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
+    if (!items.length) return;
+    lines.push('── ' + room.name.toUpperCase() + ' ──');
+    items.forEach(item => {
+      const e = edits[item.id];
+      lines.push(item.label + ': ' + e.name + (e.desc ? ' (' + e.desc + ')' : ''));
+      lines.push('  SKU: ' + e.sku + '  |  Qty: ' + quantities[item.id] + ' ' + item.unit);
+    });
+    lines.push('');
+  });
+  if (notes.trim()) lines.push('NOTES: ' + notes.trim());
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  copied = true; render();
+  setTimeout(() => { copied = false; render(); }, 3000);
+}
+
+function generatePDF() {
+  const date     = new Date().toLocaleDateString('en-US', { month: 'long',  day: 'numeric', year: 'numeric' });
+  const dateShort= new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const unitLabel = u => u === 'sqft' ? 'sq ft' : u === 'bags' ? 'bags' : 'pcs';
+
+  let roomsHtml = '';
+  rooms.forEach(room => {
+    const items = room.items.filter(i => !edits[i.id].skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
+    if (!items.length) return;
+    roomsHtml += `<div class="pf-room-label">${room.name}</div>`;
+    roomsHtml += `
+      <table class="pf-table">
+        <thead>
+          <tr>
+            <th style="width:26%">Item</th>
+            <th style="width:36%">Product</th>
+            <th style="width:18%">SKU</th>
+            <th class="r" style="width:20%">Qty</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.map((item, idx) => {
+            const e = edits[item.id];
+            return `
+              <tr class="${idx % 2 === 1 ? 'even' : ''}">
+                <td><div class="pf-item-label">${item.label}</div></td>
+                <td>
+                  <div>${e.name}</div>
+                  ${e.desc ? `<div class="pf-item-desc">${e.desc}</div>` : ''}
+                </td>
+                <td><span class="pf-sku">${e.sku}</span></td>
+                <td class="pf-qty">${quantities[item.id]} <span class="pf-unit">${unitLabel(item.unit)}</span></td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  });
+
+  document.getElementById('print-frame').innerHTML = `
+    <div class="pf-header">
+      <div>
+        <div class="pf-company">Wilde Holdings, LLC</div>
+        <div class="pf-tagline">Tile Material Order</div>
+      </div>
+      <div class="pf-meta">
+        <div class="pf-meta-label">Date</div>
+        <div class="pf-meta-value">${date}</div>
+      </div>
+    </div>
+    ${projectName ? `
+      <div class="pf-project">
+        <div class="pf-project-label">Project</div>
+        <div class="pf-project-name">${projectName}</div>
+      </div>` : ''}
+    ${roomsHtml}
+    ${notes.trim() ? `
+      <div class="pf-notes">
+        <div class="pf-notes-label">Notes</div>
+        <div class="pf-notes-text">${notes.trim()}</div>
+      </div>` : ''}
+    <div class="pf-footer">
+      <span>Wilde Holdings, LLC — Tile Order</span>
+      <span>${dateShort}${projectName ? ' · ' + projectName : ''}</span>
+    </div>
+  `;
+
+  const oldTitle = document.title;
+  document.title = 'Tile Order' + (projectName ? ' — ' + projectName : '') + ' — ' + dateShort;
+  window.print();
+  setTimeout(() => { document.title = oldTitle; }, 1500);
+}
+
+function restartAll() {
+  projectName = ''; notes = ''; copied = false; phase = 'setup';
+  initState(); render(); window.scrollTo(0,0);
+}
+
+render();
+</script>
 </body>
 </html>
