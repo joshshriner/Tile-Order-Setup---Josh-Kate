@@ -8,36 +8,70 @@
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'IBM Plex Sans', sans-serif; background: #0f0f0f; color: #e8e8e8; min-height: 100vh; }
-  .app { max-width: 700px; margin: 0 auto; padding: 24px 16px 80px; }
+  .app { max-width: 720px; margin: 0 auto; padding: 24px 16px 80px; }
 
+  /* ── HEADER ── */
   .header { border-bottom: 1px solid #2a2a2a; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
   .header-left h1 { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #4ade80; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
   .header-left p { font-size: 12px; color: #555; font-family: 'IBM Plex Mono', monospace; }
+  .header-right { display: flex; gap: 8px; align-items: center; }
   .phase-badge { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; background: #0d2010; border: 1px solid #166534; border-radius: 4px; padding: 4px 10px; }
+  .lib-toggle-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #888; background: #141414; border: 1px solid #2a2a2a; border-radius: 4px; padding: 4px 10px; cursor: pointer; transition: all 0.2s; }
+  .lib-toggle-btn:hover, .lib-toggle-btn.active { color: #4ade80; border-color: #166534; background: #0d1f12; }
 
+  /* ── PHASE TABS ── */
   .phase-tabs { display: flex; gap: 4px; margin-bottom: 24px; background: #111; border-radius: 8px; padding: 4px; }
-  .phase-tab { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 8px 6px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .phase-tab { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 8px 4px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-align: center; }
   .phase-tab.inactive { background: none; color: #444; }
   .phase-tab.inactive:hover { color: #888; }
   .phase-tab.active { background: #1a1a1a; color: #4ade80; border: 1px solid #2a2a2a; }
   .phase-tab.done { background: none; color: #166534; cursor: pointer; }
 
+  /* ── LIBRARY PANEL ── */
+  .lib-panel { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  .lib-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .lib-panel-title { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #4ade80; letter-spacing: 0.1em; text-transform: uppercase; }
+  .lib-panel-sub { font-size: 12px; color: #555; margin-top: 2px; }
+
+  .lib-category { margin-bottom: 18px; }
+  .lib-category-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #1a1a1a; }
+  .lib-products { display: flex; flex-direction: column; gap: 6px; }
+  .lib-product-row { display: flex; align-items: center; gap: 8px; background: #141414; border: 1px solid #1e1e1e; border-radius: 7px; padding: 10px 12px; }
+  .lib-product-info { flex: 1; min-width: 0; }
+  .lib-product-name { font-size: 13px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lib-product-meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #555; margin-top: 2px; }
+  .lib-product-sku { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #4ade80; background: #0d1f12; border: 1px solid #166534; padding: 2px 6px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+  .lib-product-del { font-size: 12px; color: #333; background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: all 0.2s; flex-shrink: 0; }
+  .lib-product-del:hover { color: #ef4444; background: #1a0808; }
+
+  .lib-add-form { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 14px; margin-top: 12px; }
+  .lib-add-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .lib-add-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .lib-input { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 8px 10px; outline: none; transition: border-color 0.2s; flex: 1; min-width: 120px; }
+  .lib-input:focus { border-color: #4ade80; }
+  .lib-input.mono { font-family: 'IBM Plex Mono', monospace; }
+  .lib-input.short { flex: 0 0 100px; }
+  .lib-select { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 8px 10px; outline: none; flex: 0 0 130px; cursor: pointer; }
+  .lib-select:focus { border-color: #4ade80; }
+  .lib-add-btn { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #0a1f0f; background: #4ade80; border: none; border-radius: 6px; padding: 8px 18px; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+  .lib-add-btn:hover { background: #22c55e; }
+  .lib-empty { font-size: 12px; color: #444; padding: 8px 0; }
+
+  /* ── SETUP PHASE ── */
   .step-header { margin-bottom: 20px; }
   .step-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.08em; margin-bottom: 4px; }
   .step-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
   .step-sub { font-size: 13px; color: #555; }
 
-  /* Room management */
   .room-block { background: #141414; border: 1px solid #222; border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
   .room-block-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #1e1e1e; }
-  .room-name-input { flex: 1; background: none; border: none; color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; font-weight: 600; outline: none; min-width: 0; }
+  .room-name-input { flex: 1; background: none; border: none; border-bottom: 1px solid transparent; color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; font-weight: 600; outline: none; min-width: 0; padding-bottom: 2px; transition: border-color 0.2s; }
+  .room-name-input:focus { border-bottom-color: #4ade80; }
   .room-name-input::placeholder { color: #444; }
-  .room-name-input:focus { border-bottom: 1px solid #4ade80; }
   .room-delete-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #555; background: none; border: 1px solid #2a2a2a; border-radius: 5px; padding: 5px 10px; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
   .room-delete-btn:hover { color: #ef4444; border-color: #3f1010; background: #1a0808; }
-
-  /* Item cards inside a room */
   .room-items { padding: 10px 14px 12px; }
+
   .setup-card { background: #1a1a1a; border: 1px solid #242424; border-radius: 8px; margin-bottom: 6px; overflow: hidden; }
   .setup-card-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; cursor: pointer; user-select: none; }
   .setup-card-header:hover { background: #1e1e1e; }
@@ -50,6 +84,14 @@
   .setup-card-body { padding: 0 14px 12px; border-top: 1px solid #1e1e1e; display: none; }
   .setup-card-body.open { display: block; padding-top: 12px; }
   .skipped-overlay { opacity: 0.45; pointer-events: none; }
+
+  /* Library picker inside setup card */
+  .lib-picker { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #1e1e1e; flex-wrap: wrap; }
+  .lib-picker-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #555; white-space: nowrap; }
+  .lib-picker-select { flex: 1; min-width: 160px; background: #111; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; padding: 6px 10px; outline: none; cursor: pointer; }
+  .lib-picker-select:focus { border-color: #4ade80; }
+  .lib-picker-apply { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #0a1f0f; background: #4ade80; border: none; border-radius: 5px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
+  .lib-picker-apply:hover { background: #22c55e; }
 
   .field-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
   .field-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 130px; }
@@ -64,18 +106,17 @@
   .skip-toggle label { font-size: 12px; color: #666; cursor: pointer; }
   .skip-toggle input[type=checkbox] { accent-color: #ef4444; width: 14px; height: 14px; cursor: pointer; }
 
-  /* Add room UI */
-  .add-room-bar { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
-  .add-room-presets { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .add-room-bar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
   .preset-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #888; background: #141414; border: 1px solid #2a2a2a; border-radius: 6px; padding: 7px 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
   .preset-btn:hover { color: #4ade80; border-color: #166534; background: #0d1f12; }
-  .custom-room-input { background: #141414; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 7px 12px; outline: none; width: 160px; transition: border-color 0.2s; }
+  .custom-room-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .custom-room-input { flex: 1; background: #141414; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 7px 12px; outline: none; transition: border-color 0.2s; }
   .custom-room-input:focus { border-color: #4ade80; }
-  .add-custom-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #0a1f0f; background: #4ade80; border: none; border-radius: 6px; padding: 7px 14px; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+  .add-custom-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #0a1f0f; background: #4ade80; border: none; border-radius: 6px; padding: 7px 16px; cursor: pointer; white-space: nowrap; }
   .add-custom-btn:hover { background: #22c55e; }
 
-  /* Order phase */
-  .order-room-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 6px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 16px; }
+  /* ── ORDER PHASE ── */
+  .order-room-header { padding: 8px 0 6px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 16px; }
   .order-room-header:first-child { margin-top: 0; }
   .order-room-name { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.12em; text-transform: uppercase; }
   .order-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; }
@@ -89,7 +130,7 @@
   .qty-input:focus { border-color: #4ade80; }
   .qty-input.has-value { border-color: #166534; background: #0d1f12; color: #4ade80; }
 
-  /* Summary */
+  /* ── SUMMARY ── */
   .summary-room { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 0 6px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 16px; }
   .summary-room:first-child { margin-top: 0; }
   .summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #111; gap: 12px; }
@@ -97,40 +138,32 @@
   .summary-item-sku { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #555; margin-top: 2px; }
   .summary-qty { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #4ade80; font-weight: 600; white-space: nowrap; }
 
+  /* ── SHARED ── */
   .note-box { background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
   .note-box label { display: block; font-size: 10px; color: #555; margin-bottom: 8px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
   .note-box input, .note-box textarea { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; padding: 10px; outline: none; resize: vertical; transition: border-color 0.2s; }
   .note-box input:focus, .note-box textarea:focus { border-color: #4ade80; }
-
   .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }
   .btn { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; padding: 12px 24px; border-radius: 8px; cursor: pointer; border: none; transition: all 0.2s; letter-spacing: 0.05em; }
   .btn-back { background: #1a1a1a; color: #888; border: 1px solid #2a2a2a; }
   .btn-back:hover { background: #222; color: #ccc; }
   .btn-next { background: #4ade80; color: #0a1f0f; font-weight: 600; }
   .btn-next:hover { background: #22c55e; }
-
   .action-row { display: flex; gap: 10px; margin-top: 8px; }
   .copy-btn { flex: 1; background: #1e1e1e; color: #aaa; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; padding: 13px; border: 1px solid #2a2a2a; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
   .copy-btn:hover { background: #252525; color: #ccc; }
   .copy-btn.copied { background: #0d1f12; color: #4ade80; border-color: #166534; }
-  .pdf-btn { flex: 1; background: #4ade80; color: #0a1f0f; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 13px; border: none; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+  .pdf-btn { flex: 1; background: #4ade80; color: #0a1f0f; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 13px; border: none; border-radius: 8px; cursor: pointer; }
   .pdf-btn:hover { background: #22c55e; }
   .restart-btn { width: 100%; background: none; color: #555; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 12px; border: 1px solid #222; border-radius: 8px; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
   .restart-btn:hover { color: #888; border-color: #333; }
   .empty-state { text-align: center; padding: 40px 0; color: #444; font-size: 13px; }
 
-  /* Print frame */
+  /* ── PRINT ── */
   #print-frame { display: none; }
-
   @media print {
     body > .app { display: none !important; }
-    #print-frame {
-      display: block !important;
-      font-family: 'IBM Plex Sans', Arial, sans-serif;
-      font-size: 11pt;
-      color: #111;
-      padding: 0.5in 0.6in;
-    }
+    #print-frame { display: block !important; font-family: 'IBM Plex Sans', Arial, sans-serif; font-size: 11pt; color: #111; padding: 0.5in 0.6in; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     .pf-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2.5pt solid #111; padding-bottom: 12pt; margin-bottom: 18pt; }
     .pf-company { font-family: 'IBM Plex Mono', monospace; font-size: 16pt; font-weight: 700; letter-spacing: 0.04em; color: #111; margin-bottom: 3pt; }
@@ -165,24 +198,38 @@
 <div id="print-frame"></div>
 <div class="app" id="app"></div>
 <script>
-// ── ITEM TEMPLATES ────────────────────────────────────────────────────
-// These are the line items that get added to any room. Labels are generic,
-// SKUs/names/descs are editable per job.
-const ITEM_TEMPLATES = [
-  { tpl: 'floor_tile',    label: 'Floor Tile',            name: '', desc: '', sku: '', unit: 'sqft' },
-  { tpl: 'floor_grout',   label: 'Floor Grout',           name: '', desc: '', sku: '', unit: 'bags' },
-  { tpl: 'shower_fl_tile',label: 'Shower Floor Tile',     name: '', desc: '', sku: '', unit: 'sqft' },
-  { tpl: 'shower_fl_grout',label:'Shower Floor Grout',    name: '', desc: '', sku: '', unit: 'bags' },
-  { tpl: 'shower_tile',   label: 'Shower Surround Tile',  name: '', desc: '', sku: '', unit: 'sqft' },
-  { tpl: 'shower_grout',  label: 'Shower Surround Grout', name: '', desc: '', sku: '', unit: 'bags' },
-  { tpl: 'shower_trim',   label: 'Shower Schluter Trim',  name: '', desc: '', sku: '', unit: 'pcs'  },
-  { tpl: 'bs_tile',       label: 'Backsplash Tile',       name: '', desc: '', sku: '', unit: 'sqft' },
-  { tpl: 'bs_grout',      label: 'Backsplash Grout',      name: '', desc: '', sku: '', unit: 'bags' },
-  { tpl: 'bs_trim',       label: 'Backsplash Schluter Trim', name: '', desc: '', sku: '', unit: 'pcs' },
-];
+// ── PRODUCT LIBRARY (localStorage) ───────────────────────────────────
+const CATEGORIES = ['Tile','Grout','Schluter Trim','Other'];
+const LIB_KEY = 'wilde_products_v1';
+
+function loadLibrary() {
+  try { return JSON.parse(localStorage.getItem(LIB_KEY)) || []; } catch(e) { return []; }
+}
+function saveLibrary(lib) {
+  localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+}
+function addProduct(name, desc, sku, unit, category) {
+  const lib = loadLibrary();
+  lib.push({ id: 'p' + Date.now(), name, desc, sku, unit, category });
+  saveLibrary(lib);
+}
+function deleteProduct(pid) {
+  saveLibrary(loadLibrary().filter(p => p.id !== pid));
+}
 
 // ── ROOM PRESETS ──────────────────────────────────────────────────────
-// Which item templates to include by default for each room type
+const ITEM_TEMPLATES = [
+  { tpl: 'floor_tile',      label: 'Floor Tile',             unit: 'sqft', category: 'Tile' },
+  { tpl: 'floor_grout',     label: 'Floor Grout',            unit: 'bags', category: 'Grout' },
+  { tpl: 'shower_fl_tile',  label: 'Shower Floor Tile',      unit: 'sqft', category: 'Tile' },
+  { tpl: 'shower_fl_grout', label: 'Shower Floor Grout',     unit: 'bags', category: 'Grout' },
+  { tpl: 'shower_tile',     label: 'Shower Surround Tile',   unit: 'sqft', category: 'Tile' },
+  { tpl: 'shower_grout',    label: 'Shower Surround Grout',  unit: 'bags', category: 'Grout' },
+  { tpl: 'shower_trim',     label: 'Shower Schluter Trim',   unit: 'pcs',  category: 'Schluter Trim' },
+  { tpl: 'bs_tile',         label: 'Backsplash Tile',        unit: 'sqft', category: 'Tile' },
+  { tpl: 'bs_grout',        label: 'Backsplash Grout',       unit: 'bags', category: 'Grout' },
+  { tpl: 'bs_trim',         label: 'Backsplash Schluter Trim', unit: 'pcs', category: 'Schluter Trim' },
+];
 const ROOM_PRESETS = {
   'Hall Bathroom':    ['floor_tile','floor_grout','shower_tile','shower_grout','shower_trim'],
   'Primary Bathroom': ['floor_tile','floor_grout','shower_fl_tile','shower_fl_grout','shower_tile','shower_grout','shower_trim'],
@@ -192,18 +239,22 @@ const ROOM_PRESETS = {
   'Mudroom':          ['floor_tile','floor_grout'],
 };
 
-// ── STATE ─────────────────────────────────────────────────────────────
+// ── APP STATE ─────────────────────────────────────────────────────────
 let phase = 'setup';
-let rooms = [];       // [{ id, name, items: [{ id, tpl, label, name, desc, sku, unit, skipped }] }]
-let quantities = {};  // itemId -> string
-let openCards = {};   // itemId -> bool
+let showLib = false;
+let rooms = [];
+let quantities = {};
+let openCards = {};
 let projectName = '';
 let notes = '';
 let copied = false;
 let customRoomInput = '';
 let _nextId = 1;
 
-function uid() { return 'id' + (_nextId++); }
+// Library form state
+let libForm = { name: '', desc: '', sku: '', unit: 'sqft', category: 'Tile' };
+
+function uid() { return 'x' + (_nextId++); }
 
 function makeRoom(name, tplKeys) {
   const items = tplKeys.map(key => {
@@ -211,12 +262,13 @@ function makeRoom(name, tplKeys) {
     const itemId = uid();
     quantities[itemId] = '';
     openCards[itemId] = false;
-    return { id: itemId, tpl: key, label: tpl.label, name: tpl.name, desc: tpl.desc, sku: tpl.sku, unit: tpl.unit, skipped: false };
+    return { id: itemId, tpl: key, label: tpl.label, name: '', desc: '', sku: '', unit: tpl.unit, category: tpl.category, skipped: false };
   });
   return { id: uid(), name, items };
 }
 
 function initState() {
+  _nextId = 1;
   rooms = [
     makeRoom('Hall Bathroom',    ROOM_PRESETS['Hall Bathroom']),
     makeRoom('Primary Bathroom', ROOM_PRESETS['Primary Bathroom']),
@@ -228,7 +280,7 @@ function initState() {
 }
 initState();
 
-// ── RENDER ROOT ───────────────────────────────────────────────────────
+// ── RENDER ────────────────────────────────────────────────────────────
 function render() {
   const app = document.getElementById('app');
   app.innerHTML = `
@@ -237,7 +289,12 @@ function render() {
         <h1>Tile Order Builder</h1>
         <p>Wilde Holdings — Material Order</p>
       </div>
-      <div class="phase-badge">${phase==='setup'?'SETUP':phase==='order'?'ORDER':'SUMMARY'}</div>
+      <div class="header-right">
+        <button class="lib-toggle-btn ${showLib?'active':''}" onclick="showLib=!showLib;render()">
+          ${showLib ? '✕ Close Library' : '⊞ Products Library'}
+        </button>
+        <div class="phase-badge">${phase==='setup'?'SETUP':phase==='order'?'ORDER':'SUMMARY'}</div>
+      </div>
     </div>
     <div class="phase-tabs">
       <button class="phase-tab ${phase==='setup'?'active':(phase==='order'||phase==='summary')?'done':'inactive'}"
@@ -247,9 +304,83 @@ function render() {
       <button class="phase-tab ${phase==='summary'?'active':'inactive'}">3 · Summary</button>
     </div>
   `;
+  if (showLib) renderLibrary(app);
   if (phase === 'setup') renderSetup(app);
   else if (phase === 'order') renderOrder(app);
   else renderSummary(app);
+}
+
+// ── LIBRARY PANEL ─────────────────────────────────────────────────────
+function renderLibrary(app) {
+  const lib = loadLibrary();
+  let html = `
+    <div class="lib-panel">
+      <div class="lib-panel-header">
+        <div>
+          <div class="lib-panel-title">Products Library</div>
+          <div class="lib-panel-sub">Saved products — pick from these when configuring a job.</div>
+        </div>
+      </div>
+  `;
+
+  CATEGORIES.forEach(cat => {
+    const catProducts = lib.filter(p => p.category === cat);
+    html += `<div class="lib-category"><div class="lib-category-label">${cat}</div><div class="lib-products">`;
+    if (catProducts.length === 0) {
+      html += `<div class="lib-empty">No ${cat.toLowerCase()} saved yet.</div>`;
+    } else {
+      catProducts.forEach(p => {
+        html += `
+          <div class="lib-product-row">
+            <div class="lib-product-info">
+              <div class="lib-product-name">${p.name}</div>
+              <div class="lib-product-meta">${p.desc ? p.desc + ' · ' : ''}${p.unit}</div>
+            </div>
+            <span class="lib-product-sku">${p.sku}</span>
+            <button class="lib-product-del" onclick="deleteProduct('${p.id}');render()" title="Remove">✕</button>
+          </div>
+        `;
+      });
+    }
+    html += `</div></div>`;
+  });
+
+  // Add form
+  html += `
+    <div class="lib-add-form">
+      <div class="lib-add-title">Add New Product</div>
+      <div class="lib-add-row">
+        <input class="lib-input" type="text" placeholder="Product name" id="lf-name" value="${libForm.name}"
+          oninput="libForm.name=this.value" />
+        <input class="lib-input" type="text" placeholder="Description / color" id="lf-desc" value="${libForm.desc}"
+          oninput="libForm.desc=this.value" />
+      </div>
+      <div class="lib-add-row">
+        <input class="lib-input mono" type="text" placeholder="SKU" id="lf-sku" value="${libForm.sku}"
+          oninput="libForm.sku=this.value" />
+        <select class="lib-select" id="lf-cat" onchange="libForm.category=this.value">
+          ${CATEGORIES.map(c => `<option value="${c}" ${libForm.category===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+        <select class="lib-select" style="flex:0 0 100px" id="lf-unit" onchange="libForm.unit=this.value">
+          <option value="sqft" ${libForm.unit==='sqft'?'selected':''}>sqft</option>
+          <option value="bags" ${libForm.unit==='bags'?'selected':''}>bags</option>
+          <option value="pcs"  ${libForm.unit==='pcs'?'selected':''}>pcs</option>
+        </select>
+        <button class="lib-add-btn" onclick="saveLibProduct()">Save</button>
+      </div>
+    </div>
+  </div>
+  `;
+  app.insertAdjacentHTML('beforeend', html);
+}
+
+function saveLibProduct() {
+  const name = libForm.name.trim();
+  const sku  = libForm.sku.trim();
+  if (!name || !sku) { alert('Product name and SKU are required.'); return; }
+  addProduct(name, libForm.desc.trim(), sku, libForm.unit, libForm.category);
+  libForm = { name: '', desc: '', sku: '', unit: 'sqft', category: 'Tile' };
+  render();
 }
 
 // ── PHASE 1: SETUP ────────────────────────────────────────────────────
@@ -258,43 +389,45 @@ function renderSetup(app) {
     <div class="step-header">
       <div class="step-label">PHASE 1 — PROJECT SETUP</div>
       <div class="step-title">Configure This Job</div>
-      <div class="step-sub">Add or remove rooms, rename them, then edit SKUs for each item.</div>
+      <div class="step-sub">Add/remove rooms, then set SKUs — pick from your library or type manually.</div>
     </div>
     <div class="note-box">
       <label>Project / Address</label>
       <input type="text" placeholder="e.g. 501 S 24th St Broken Arrow" value="${projectName}" oninput="projectName=this.value" />
     </div>
-  `;
-
-  // Add room bar
-  html += `<div class="add-room-bar">
-    <div class="add-room-presets">
+    <div class="add-room-bar">
       ${Object.keys(ROOM_PRESETS).map(name => `
         <button class="preset-btn" onclick="addRoom('${name.replace(/'/g,"\\'")}')">+ ${name}</button>
       `).join('')}
     </div>
-  </div>
-  <div class="add-room-bar" style="margin-top:-10px;margin-bottom:20px">
-    <input class="custom-room-input" id="custom-room-input" type="text" placeholder="Custom room name..." value="${customRoomInput}"
-      oninput="customRoomInput=this.value"
-      onkeydown="if(event.key==='Enter')addCustomRoom()" />
-    <button class="add-custom-btn" onclick="addCustomRoom()">+ Add</button>
-  </div>`;
+    <div class="custom-room-row">
+      <input class="custom-room-input" type="text" placeholder="Custom room name..." value="${customRoomInput}"
+        oninput="customRoomInput=this.value" onkeydown="if(event.key==='Enter')addCustomRoom()" />
+      <button class="add-custom-btn" onclick="addCustomRoom()">+ Add Room</button>
+    </div>
+  `;
 
-  // Rooms
+  if (rooms.length === 0) {
+    html += `<div class="empty-state">No rooms yet. Add one above.</div>`;
+  }
+
   rooms.forEach((room, ri) => {
     html += `
       <div class="room-block">
         <div class="room-block-header">
           <input class="room-name-input" type="text" placeholder="Room name..." value="${room.name.replace(/"/g,'&quot;')}"
             oninput="rooms[${ri}].name=this.value" />
-          <button class="room-delete-btn" onclick="deleteRoom(${ri})">Remove Room</button>
+          <button class="room-delete-btn" onclick="deleteRoom(${ri})">Remove</button>
         </div>
         <div class="room-items">
     `;
+
     room.items.forEach((item, ii) => {
       const isOpen = openCards[item.id];
       const hasSku = item.sku.trim() !== '';
+      const lib = loadLibrary();
+      const catProducts = lib.filter(p => p.category === item.category);
+
       html += `
         <div class="setup-card">
           <div class="setup-card-header" onclick="openCards['${item.id}']=!openCards['${item.id}'];render()">
@@ -306,6 +439,23 @@ function renderSetup(app) {
           </div>
           <div class="setup-card-body ${isOpen?'open':''}">
             <div class="${item.skipped?'skipped-overlay':''}">
+      `;
+
+      // Library picker (only show if there are saved products in this category)
+      if (catProducts.length > 0) {
+        html += `
+          <div class="lib-picker">
+            <span class="lib-picker-label">From library:</span>
+            <select class="lib-picker-select" id="lpick-${item.id}">
+              <option value="">— pick a saved ${item.category.toLowerCase()} —</option>
+              ${catProducts.map(p => `<option value="${p.id}">${p.name}${p.desc?' ('+p.desc+')':''} · ${p.sku}</option>`).join('')}
+            </select>
+            <button class="lib-picker-apply" onclick="applyLibProduct(${ri},${ii},'${item.id}')">Apply</button>
+          </div>
+        `;
+      }
+
+      html += `
               <div class="field-row">
                 <div class="field-group">
                   <span class="field-label">Product Name</span>
@@ -317,7 +467,7 @@ function renderSetup(app) {
               <div class="field-row">
                 <div class="field-group">
                   <span class="field-label">Description / Color</span>
-                  <input class="field-input ${item.desc?'has-value':''}" type="text" placeholder="e.g. Matte black, vertical stack"
+                  <input class="field-input ${item.desc?'has-value':''}" type="text" placeholder="e.g. Matte black"
                     value="${item.desc.replace(/"/g,'&quot;')}"
                     oninput="rooms[${ri}].items[${ii}].desc=this.value" />
                 </div>
@@ -338,34 +488,42 @@ function renderSetup(app) {
         </div>
       `;
     });
-    html += `</div></div>`; // close room-items, room-block
-  });
 
-  if (rooms.length === 0) {
-    html += `<div class="empty-state">No rooms yet. Add one above.</div>`;
-  }
+    html += `</div></div>`;
+  });
 
   html += `<div class="nav"><div></div><button class="btn btn-next" onclick="phase='order';render();scrollTo(0,0)">Start Order →</button></div>`;
   app.insertAdjacentHTML('beforeend', html);
 }
 
+function applyLibProduct(ri, ii, itemId) {
+  const sel = document.getElementById('lpick-' + itemId);
+  if (!sel || !sel.value) return;
+  const lib = loadLibrary();
+  const product = lib.find(p => p.id === sel.value);
+  if (!product) return;
+  rooms[ri].items[ii].name = product.name;
+  rooms[ri].items[ii].desc = product.desc;
+  rooms[ri].items[ii].sku  = product.sku;
+  rooms[ri].items[ii].unit = product.unit;
+  openCards[itemId] = true;
+  render();
+}
+
 function addRoom(name) {
   const tplKeys = ROOM_PRESETS[name] || ['floor_tile','floor_grout'];
-  const room = makeRoom(name, tplKeys);
-  rooms.push(room);
+  rooms.push(makeRoom(name, tplKeys));
   render();
 }
 
 function addCustomRoom() {
   const name = customRoomInput.trim();
   if (!name) return;
-  // Pick a sensible default template set based on keywords
   let tplKeys = ['floor_tile','floor_grout'];
   const lower = name.toLowerCase();
   if (lower.includes('bath')) tplKeys = ROOM_PRESETS['Hall Bathroom'];
   else if (lower.includes('kitchen')) tplKeys = ROOM_PRESETS['Kitchen'];
-  const room = makeRoom(name, tplKeys);
-  rooms.push(room);
+  rooms.push(makeRoom(name, tplKeys));
   customRoomInput = '';
   render();
 }
@@ -385,7 +543,6 @@ function renderOrder(app) {
       <div class="step-sub">Fill in what you need. Skipped items are excluded.</div>
     </div>
   `;
-
   rooms.forEach(room => {
     const active = room.items.filter(i => !i.skipped);
     if (!active.length) return;
@@ -411,9 +568,7 @@ function renderOrder(app) {
       `;
     });
   });
-
-  if (rooms.length === 0) html += `<div class="empty-state">No rooms configured. Go back and add some.</div>`;
-
+  if (!rooms.length) html += `<div class="empty-state">No rooms configured.</div>`;
   html += `
     <div class="nav">
       <button class="btn btn-back" onclick="phase='setup';render();scrollTo(0,0)">← Back</button>
@@ -427,13 +582,12 @@ function renderOrder(app) {
 function renderSummary(app) {
   let hasItems = false;
   let rows = '';
-
   rooms.forEach(room => {
-    const orderItems = room.items.filter(i => !i.skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
-    if (!orderItems.length) return;
+    const items = room.items.filter(i => !i.skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
+    if (!items.length) return;
     hasItems = true;
     rows += `<div class="summary-room">${room.name}</div>`;
-    orderItems.forEach(item => {
+    items.forEach(item => {
       rows += `
         <div class="summary-row">
           <div>
@@ -456,7 +610,7 @@ function renderSummary(app) {
       <label>Project / Address</label>
       <input type="text" placeholder="e.g. 501 S 24th St Broken Arrow" value="${projectName}" oninput="projectName=this.value" />
     </div>
-    ${hasItems ? rows : '<div class="empty-state">No items with quantities entered. Go back and add some.</div>'}
+    ${hasItems ? rows : '<div class="empty-state">No items with quantities entered.</div>'}
     <div class="note-box" style="margin-top:16px">
       <label>Notes for Rep</label>
       <textarea rows="3" placeholder="Any special instructions..." oninput="notes=this.value">${notes}</textarea>
@@ -507,66 +661,45 @@ function generatePDF() {
   const date      = new Date().toLocaleDateString('en-US', { month: 'long',  day: 'numeric', year: 'numeric' });
   const dateShort = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   const unitLabel = u => u === 'sqft' ? 'sq ft' : u === 'bags' ? 'bags' : 'pcs';
-
   let roomsHtml = '';
   rooms.forEach(room => {
     const items = room.items.filter(i => !i.skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
     if (!items.length) return;
-    roomsHtml += `<div class="pf-room-label">${room.name}</div>`;
-    roomsHtml += `
+    roomsHtml += `<div class="pf-room-label">${room.name}</div>
       <table class="pf-table">
         <thead><tr>
-          <th style="width:26%">Item</th>
-          <th style="width:36%">Product</th>
-          <th style="width:18%">SKU</th>
-          <th class="r" style="width:20%">Qty</th>
+          <th style="width:26%">Item</th><th style="width:36%">Product</th>
+          <th style="width:18%">SKU</th><th class="r" style="width:20%">Qty</th>
         </tr></thead>
-        <tbody>
-          ${items.map((item, idx) => `
-            <tr class="${idx%2===1?'even':''}">
-              <td><div class="pf-item-label">${item.label}</div></td>
-              <td><div>${item.name}</div>${item.desc?`<div class="pf-item-desc">${item.desc}</div>`:''}</td>
-              <td><span class="pf-sku">${item.sku}</span></td>
-              <td class="pf-qty">${quantities[item.id]} <span class="pf-unit">${unitLabel(item.unit)}</span></td>
-            </tr>
-          `).join('')}
+        <tbody>${items.map((item,idx) => `
+          <tr class="${idx%2===1?'even':''}">
+            <td><div class="pf-item-label">${item.label}</div></td>
+            <td><div>${item.name}</div>${item.desc?`<div class="pf-item-desc">${item.desc}</div>`:''}</td>
+            <td><span class="pf-sku">${item.sku}</span></td>
+            <td class="pf-qty">${quantities[item.id]} <span class="pf-unit">${unitLabel(item.unit)}</span></td>
+          </tr>`).join('')}
         </tbody>
-      </table>
-    `;
+      </table>`;
   });
-
   document.getElementById('print-frame').innerHTML = `
     <div class="pf-header">
-      <div>
-        <div class="pf-company">Wilde Holdings, LLC</div>
-        <div class="pf-tagline">Tile Material Order</div>
-      </div>
-      <div class="pf-meta">
-        <div class="pf-meta-label">Date</div>
-        <div class="pf-meta-value">${date}</div>
-      </div>
+      <div><div class="pf-company">Wilde Holdings, LLC</div><div class="pf-tagline">Tile Material Order</div></div>
+      <div class="pf-meta"><div class="pf-meta-label">Date</div><div class="pf-meta-value">${date}</div></div>
     </div>
     ${projectName?`<div class="pf-project"><div class="pf-project-label">Project</div><div class="pf-project-name">${projectName}</div></div>`:''}
     ${roomsHtml}
     ${notes.trim()?`<div class="pf-notes"><div class="pf-notes-label">Notes</div><div class="pf-notes-text">${notes.trim()}</div></div>`:''}
-    <div class="pf-footer">
-      <span>Wilde Holdings, LLC — Tile Order</span>
-      <span>${dateShort}${projectName?' · '+projectName:''}</span>
-    </div>
+    <div class="pf-footer"><span>Wilde Holdings, LLC — Tile Order</span><span>${dateShort}${projectName?' · '+projectName:''}</span></div>
   `;
-
-  const oldTitle = document.title;
+  const old = document.title;
   document.title = 'Tile Order' + (projectName?' — '+projectName:'') + ' — ' + dateShort;
   window.print();
-  setTimeout(() => { document.title = oldTitle; }, 1500);
+  setTimeout(() => { document.title = old; }, 1500);
 }
 
 // ── RESTART ───────────────────────────────────────────────────────────
 function restartAll() {
-  _nextId = 1;
-  initState();
-  render();
-  scrollTo(0,0);
+  initState(); render(); scrollTo(0,0);
 }
 
 render();
