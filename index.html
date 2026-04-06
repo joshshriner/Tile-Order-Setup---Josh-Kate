@@ -6,7 +6,6 @@
 <title>Tile Order Builder — Wilde Holdings</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'IBM Plex Sans', sans-serif; background: #0f0f0f; color: #e8e8e8; min-height: 100vh; }
   .app { max-width: 700px; margin: 0 auto; padding: 24px 16px 80px; }
@@ -28,38 +27,59 @@
   .step-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
   .step-sub { font-size: 13px; color: #555; }
 
-  .setup-card { background: #141414; border: 1px solid #222; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
-  .setup-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; user-select: none; }
-  .setup-card-header:hover { background: #181818; }
+  /* Room management */
+  .room-block { background: #141414; border: 1px solid #222; border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
+  .room-block-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #1e1e1e; }
+  .room-name-input { flex: 1; background: none; border: none; color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; font-weight: 600; outline: none; min-width: 0; }
+  .room-name-input::placeholder { color: #444; }
+  .room-name-input:focus { border-bottom: 1px solid #4ade80; }
+  .room-delete-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #555; background: none; border: 1px solid #2a2a2a; border-radius: 5px; padding: 5px 10px; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
+  .room-delete-btn:hover { color: #ef4444; border-color: #3f1010; background: #1a0808; }
+
+  /* Item cards inside a room */
+  .room-items { padding: 10px 14px 12px; }
+  .setup-card { background: #1a1a1a; border: 1px solid #242424; border-radius: 8px; margin-bottom: 6px; overflow: hidden; }
+  .setup-card-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; cursor: pointer; user-select: none; }
+  .setup-card-header:hover { background: #1e1e1e; }
   .setup-card-label { font-size: 13px; font-weight: 500; color: #ccc; }
-  .setup-card-sku { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #555; background: #1a1a1a; padding: 3px 8px; border-radius: 4px; }
+  .setup-card-sku { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #555; background: #111; padding: 3px 8px; border-radius: 4px; }
   .setup-card-sku.filled { color: #4ade80; background: #0d1f12; border: 1px solid #166534; }
   .setup-card-sku.skipped-badge { color: #ef4444; background: #1a0808; border: 1px solid #3f1010; }
-  .setup-card-toggle { font-size: 11px; color: #444; transition: transform 0.2s; margin-left: 8px; }
+  .setup-card-toggle { font-size: 10px; color: #444; transition: transform 0.2s; margin-left: 8px; flex-shrink: 0; }
   .setup-card-toggle.open { transform: rotate(90deg); }
-  .setup-card-body { padding: 0 16px 14px; border-top: 1px solid #1a1a1a; display: none; }
+  .setup-card-body { padding: 0 14px 12px; border-top: 1px solid #1e1e1e; display: none; }
   .setup-card-body.open { display: block; padding-top: 12px; }
   .skipped-overlay { opacity: 0.45; pointer-events: none; }
 
   .field-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-  .field-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
-  .field-group.sku-field { flex: 0 0 150px; }
+  .field-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 130px; }
+  .field-group.sku-field { flex: 0 0 148px; }
   .field-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.08em; text-transform: uppercase; }
   .req { color: #ef4444; }
-  .field-input { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 8px 10px; outline: none; width: 100%; transition: border-color 0.2s; }
+  .field-input { background: #111; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 8px 10px; outline: none; width: 100%; transition: border-color 0.2s; }
   .field-input:focus { border-color: #4ade80; }
   .field-input.mono { font-family: 'IBM Plex Mono', monospace; }
   .field-input.has-value { border-color: #166534; }
-
-  .skip-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 0 2px; border-top: 1px solid #1a1a1a; margin-top: 4px; }
+  .skip-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 0 2px; border-top: 1px solid #1e1e1e; margin-top: 4px; }
   .skip-toggle label { font-size: 12px; color: #666; cursor: pointer; }
   .skip-toggle input[type=checkbox] { accent-color: #ef4444; width: 14px; height: 14px; cursor: pointer; }
 
-  .room-header { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.12em; text-transform: uppercase; padding: 16px 0 8px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 6px; }
-  .room-header:first-child { margin-top: 0; }
+  /* Add room UI */
+  .add-room-bar { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+  .add-room-presets { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .preset-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #888; background: #141414; border: 1px solid #2a2a2a; border-radius: 6px; padding: 7px 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .preset-btn:hover { color: #4ade80; border-color: #166534; background: #0d1f12; }
+  .custom-room-input { background: #141414; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 7px 12px; outline: none; width: 160px; transition: border-color 0.2s; }
+  .custom-room-input:focus { border-color: #4ade80; }
+  .add-custom-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #0a1f0f; background: #4ade80; border: none; border-radius: 6px; padding: 7px 14px; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+  .add-custom-btn:hover { background: #22c55e; }
 
-  .order-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 16px; margin-bottom: 8px; }
-  .order-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 12px; }
+  /* Order phase */
+  .order-room-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 6px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 16px; }
+  .order-room-header:first-child { margin-top: 0; }
+  .order-room-name { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.12em; text-transform: uppercase; }
+  .order-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; }
+  .order-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 12px; }
   .order-item-label { font-size: 14px; font-weight: 500; color: #e8e8e8; }
   .order-item-name { font-size: 12px; color: #666; margin-top: 2px; }
   .order-sku-badge { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; background: #0d1f12; border: 1px solid #166534; padding: 3px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
@@ -69,13 +89,7 @@
   .qty-input:focus { border-color: #4ade80; }
   .qty-input.has-value { border-color: #166534; background: #0d1f12; color: #4ade80; }
 
-  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }
-  .btn { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; padding: 12px 24px; border-radius: 8px; cursor: pointer; border: none; transition: all 0.2s; letter-spacing: 0.05em; }
-  .btn-back { background: #1a1a1a; color: #888; border: 1px solid #2a2a2a; }
-  .btn-back:hover { background: #222; color: #ccc; }
-  .btn-next { background: #4ade80; color: #0a1f0f; font-weight: 600; }
-  .btn-next:hover { background: #22c55e; }
-
+  /* Summary */
   .summary-room { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4ade80; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 0 6px; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; margin-top: 16px; }
   .summary-room:first-child { margin-top: 0; }
   .summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #111; gap: 12px; }
@@ -88,21 +102,26 @@
   .note-box input, .note-box textarea { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; color: #e8e8e8; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; padding: 10px; outline: none; resize: vertical; transition: border-color 0.2s; }
   .note-box input:focus, .note-box textarea:focus { border-color: #4ade80; }
 
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }
+  .btn { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; padding: 12px 24px; border-radius: 8px; cursor: pointer; border: none; transition: all 0.2s; letter-spacing: 0.05em; }
+  .btn-back { background: #1a1a1a; color: #888; border: 1px solid #2a2a2a; }
+  .btn-back:hover { background: #222; color: #ccc; }
+  .btn-next { background: #4ade80; color: #0a1f0f; font-weight: 600; }
+  .btn-next:hover { background: #22c55e; }
+
   .action-row { display: flex; gap: 10px; margin-top: 8px; }
   .copy-btn { flex: 1; background: #1e1e1e; color: #aaa; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; padding: 13px; border: 1px solid #2a2a2a; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
   .copy-btn:hover { background: #252525; color: #ccc; }
   .copy-btn.copied { background: #0d1f12; color: #4ade80; border-color: #166534; }
   .pdf-btn { flex: 1; background: #4ade80; color: #0a1f0f; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; padding: 13px; border: none; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
   .pdf-btn:hover { background: #22c55e; }
-
   .restart-btn { width: 100%; background: none; color: #555; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 12px; border: 1px solid #222; border-radius: 8px; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
   .restart-btn:hover { color: #888; border-color: #333; }
   .empty-state { text-align: center; padding: 40px 0; color: #444; font-size: 13px; }
 
-  /* ── PRINT FRAME (hidden on screen) ── */
+  /* Print frame */
   #print-frame { display: none; }
 
-  /* ── PRINT STYLES ── */
   @media print {
     body > .app { display: none !important; }
     #print-frame {
@@ -112,167 +131,104 @@
       color: #111;
       padding: 0.5in 0.6in;
     }
-
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-
-    .pf-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      border-bottom: 2.5pt solid #111;
-      padding-bottom: 12pt;
-      margin-bottom: 18pt;
-    }
-    .pf-company {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 16pt;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      color: #111;
-      margin-bottom: 3pt;
-    }
-    .pf-tagline {
-      font-size: 8pt;
-      color: #888;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
+    .pf-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2.5pt solid #111; padding-bottom: 12pt; margin-bottom: 18pt; }
+    .pf-company { font-family: 'IBM Plex Mono', monospace; font-size: 16pt; font-weight: 700; letter-spacing: 0.04em; color: #111; margin-bottom: 3pt; }
+    .pf-tagline { font-size: 8pt; color: #888; letter-spacing: 0.1em; text-transform: uppercase; }
     .pf-meta { text-align: right; }
     .pf-meta-label { font-size: 7.5pt; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1pt; }
     .pf-meta-value { font-size: 11pt; font-weight: 600; color: #111; margin-bottom: 5pt; }
-
-    .pf-project {
-      background: #f4f4f4;
-      border-left: 4pt solid #222;
-      padding: 9pt 12pt;
-      margin-bottom: 18pt;
-      border-radius: 0 3pt 3pt 0;
-    }
+    .pf-project { background: #f4f4f4; border-left: 4pt solid #222; padding: 9pt 12pt; margin-bottom: 18pt; border-radius: 0 3pt 3pt 0; }
     .pf-project-label { font-size: 7.5pt; color: #999; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2pt; }
     .pf-project-name { font-size: 13pt; font-weight: 700; color: #111; }
-
-    .pf-room-label {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 8pt;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #fff;
-      background: #1a1a1a;
-      padding: 5pt 10pt;
-      margin: 14pt 0 0;
-      border-radius: 2pt 2pt 0 0;
-    }
-
-    .pf-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 10pt;
-    }
+    .pf-room-label { font-family: 'IBM Plex Mono', monospace; font-size: 8pt; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; background: #1a1a1a; padding: 5pt 10pt; margin: 14pt 0 0; border-radius: 2pt 2pt 0 0; }
+    .pf-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
     .pf-table thead tr { background: #efefef; }
-    .pf-table th {
-      font-size: 7.5pt;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #777;
-      padding: 5pt 9pt;
-      text-align: left;
-      border-bottom: 1pt solid #ddd;
-    }
+    .pf-table th { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #777; padding: 5pt 9pt; text-align: left; border-bottom: 1pt solid #ddd; }
     .pf-table th.r { text-align: right; }
     .pf-table td { padding: 7pt 9pt; border-bottom: 1pt solid #eee; vertical-align: middle; }
     .pf-table tr:last-child td { border-bottom: none; }
     .pf-table tr.even { background: #fafafa; }
-
     .pf-item-label { font-weight: 600; font-size: 10pt; color: #111; }
     .pf-item-desc { font-size: 8.5pt; color: #888; margin-top: 1pt; }
-    .pf-sku {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 9pt;
-      color: #333;
-      background: #efefef;
-      padding: 2pt 6pt;
-      border-radius: 2pt;
-    }
+    .pf-sku { font-family: 'IBM Plex Mono', monospace; font-size: 9pt; color: #333; background: #efefef; padding: 2pt 6pt; border-radius: 2pt; }
     .pf-qty { font-family: 'IBM Plex Mono', monospace; font-size: 11pt; font-weight: 700; text-align: right; color: #111; }
     .pf-unit { font-size: 8.5pt; font-weight: 400; color: #888; }
-
     .pf-notes { margin-top: 18pt; border-top: 1pt solid #ddd; padding-top: 12pt; }
     .pf-notes-label { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 5pt; }
     .pf-notes-text { font-size: 10pt; color: #333; line-height: 1.5; }
-
-    .pf-footer {
-      margin-top: 24pt;
-      border-top: 1pt solid #eee;
-      padding-top: 8pt;
-      display: flex;
-      justify-content: space-between;
-      color: #bbb;
-      font-size: 8pt;
-    }
+    .pf-footer { margin-top: 24pt; border-top: 1pt solid #eee; padding-top: 8pt; display: flex; justify-content: space-between; color: #bbb; font-size: 8pt; }
   }
 </style>
 </head>
 <body>
-
 <div id="print-frame"></div>
 <div class="app" id="app"></div>
-
 <script>
-const DEFAULT_ROOMS = [
-  {
-    id: 'hall_bath', name: 'Hall Bathroom',
-    items: [
-      { id: 'hb_fl_tile',    label: 'Floor Tile',           name: 'Cashmere Mixed Finish Penny Mosaic', desc: 'Beige penny tile',       sku: '100966589', unit: 'sqft' },
-      { id: 'hb_fl_grout',   label: 'Floor Grout',          name: 'Mapei 5093 Warm Gray Grout',         desc: 'Grout color: warm gray', sku: '100221415', unit: 'bags' },
-      { id: 'hb_sh_tile',    label: 'Shower Surround Tile', name: 'Green Rectangle Zellige Tile',        desc: 'Vertical stack',         sku: '101317071', unit: 'sqft' },
-      { id: 'hb_sh_grout',   label: 'Shower Grout',         name: 'Mapei 5010 Black Grout',             desc: 'Grout color: black',     sku: '100221266', unit: 'bags' },
-      { id: 'hb_sh_trim',    label: 'Shower Schluter Trim', name: 'Schluter Schiene 3/8in',              desc: 'Matte black',            sku: '100840685', unit: 'pcs'  },
-    ]
-  },
-  {
-    id: 'primary_bath', name: 'Primary Bathroom',
-    items: [
-      { id: 'pb_fl_tile',    label: 'Floor Tile',             name: 'Cashmere Mixed Finish Penny Mosaic', desc: 'Beige penny tile',       sku: '101301588', unit: 'sqft' },
-      { id: 'pb_fl_grout',   label: 'Floor Grout',            name: 'Mapei 5093 Warm Gray Grout',         desc: 'Grout color: warm gray', sku: '100895432', unit: 'bags' },
-      { id: 'pb_shfl_tile',  label: 'Shower Floor Tile',      name: 'Cashmere Mixed Finish Penny Mosaic', desc: 'Beige penny tile',       sku: '100966589', unit: 'sqft' },
-      { id: 'pb_shfl_grout', label: 'Shower Floor Grout',     name: 'Mapei 5093 Warm Gray Grout',         desc: 'Grout color: warm gray', sku: '100221415', unit: 'bags' },
-      { id: 'pb_sh_tile',    label: 'Shower Surround Tile',   name: 'Cashmere Glossy Ceramic Tile',       desc: 'Vertical stack',         sku: '101068427', unit: 'sqft' },
-      { id: 'pb_sh_grout',   label: 'Shower Surround Grout',  name: 'Mapei 5093 Warm Gray Grout',         desc: 'Grout color: warm gray', sku: '100221415', unit: 'bags' },
-      { id: 'pb_sh_trim',    label: 'Shower Schluter Trim',   name: 'Schluter Schiene 3/8in',              desc: 'Satin brass',            sku: '100840644', unit: 'pcs'  },
-    ]
-  },
-  {
-    id: 'kitchen', name: 'Kitchen',
-    items: [
-      { id: 'k_bs_tile',  label: 'Backsplash Tile',          name: 'Zellige Perla Polished Ceramic Tile', desc: 'Modern stack', sku: '100776624', unit: 'sqft' },
-      { id: 'k_bs_grout', label: 'Backsplash Grout',         name: 'Mapei 5038 Avalanche Grout',          desc: 'Avalanche',    sku: '100221332', unit: 'bags' },
-      { id: 'k_bs_trim',  label: 'Backsplash Schluter Trim', name: 'Schluter Schiene Edge Trim 3/8in',    desc: 'White',        sku: '951501138', unit: 'pcs'  },
-    ]
-  }
+// ── ITEM TEMPLATES ────────────────────────────────────────────────────
+// These are the line items that get added to any room. Labels are generic,
+// SKUs/names/descs are editable per job.
+const ITEM_TEMPLATES = [
+  { tpl: 'floor_tile',    label: 'Floor Tile',            name: '', desc: '', sku: '', unit: 'sqft' },
+  { tpl: 'floor_grout',   label: 'Floor Grout',           name: '', desc: '', sku: '', unit: 'bags' },
+  { tpl: 'shower_fl_tile',label: 'Shower Floor Tile',     name: '', desc: '', sku: '', unit: 'sqft' },
+  { tpl: 'shower_fl_grout',label:'Shower Floor Grout',    name: '', desc: '', sku: '', unit: 'bags' },
+  { tpl: 'shower_tile',   label: 'Shower Surround Tile',  name: '', desc: '', sku: '', unit: 'sqft' },
+  { tpl: 'shower_grout',  label: 'Shower Surround Grout', name: '', desc: '', sku: '', unit: 'bags' },
+  { tpl: 'shower_trim',   label: 'Shower Schluter Trim',  name: '', desc: '', sku: '', unit: 'pcs'  },
+  { tpl: 'bs_tile',       label: 'Backsplash Tile',       name: '', desc: '', sku: '', unit: 'sqft' },
+  { tpl: 'bs_grout',      label: 'Backsplash Grout',      name: '', desc: '', sku: '', unit: 'bags' },
+  { tpl: 'bs_trim',       label: 'Backsplash Schluter Trim', name: '', desc: '', sku: '', unit: 'pcs' },
 ];
 
+// ── ROOM PRESETS ──────────────────────────────────────────────────────
+// Which item templates to include by default for each room type
+const ROOM_PRESETS = {
+  'Hall Bathroom':    ['floor_tile','floor_grout','shower_tile','shower_grout','shower_trim'],
+  'Primary Bathroom': ['floor_tile','floor_grout','shower_fl_tile','shower_fl_grout','shower_tile','shower_grout','shower_trim'],
+  'Half Bathroom':    ['floor_tile','floor_grout'],
+  'Kitchen':          ['bs_tile','bs_grout','bs_trim'],
+  'Laundry Room':     ['floor_tile','floor_grout'],
+  'Mudroom':          ['floor_tile','floor_grout'],
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────
 let phase = 'setup';
-let openCards = {};
-let rooms = [];
-let edits = {};
-let quantities = {};
+let rooms = [];       // [{ id, name, items: [{ id, tpl, label, name, desc, sku, unit, skipped }] }]
+let quantities = {};  // itemId -> string
+let openCards = {};   // itemId -> bool
 let projectName = '';
 let notes = '';
 let copied = false;
+let customRoomInput = '';
+let _nextId = 1;
+
+function uid() { return 'id' + (_nextId++); }
+
+function makeRoom(name, tplKeys) {
+  const items = tplKeys.map(key => {
+    const tpl = ITEM_TEMPLATES.find(t => t.tpl === key) || ITEM_TEMPLATES[0];
+    const itemId = uid();
+    quantities[itemId] = '';
+    openCards[itemId] = false;
+    return { id: itemId, tpl: key, label: tpl.label, name: tpl.name, desc: tpl.desc, sku: tpl.sku, unit: tpl.unit, skipped: false };
+  });
+  return { id: uid(), name, items };
+}
 
 function initState() {
-  rooms = JSON.parse(JSON.stringify(DEFAULT_ROOMS));
-  edits = {}; quantities = {}; openCards = {};
-  rooms.forEach(r => r.items.forEach(i => {
-    edits[i.id] = { name: i.name, desc: i.desc, sku: i.sku, skipped: false };
-    quantities[i.id] = '';
-    openCards[i.id] = false;
-  }));
+  rooms = [
+    makeRoom('Hall Bathroom',    ROOM_PRESETS['Hall Bathroom']),
+    makeRoom('Primary Bathroom', ROOM_PRESETS['Primary Bathroom']),
+    makeRoom('Kitchen',          ROOM_PRESETS['Kitchen']),
+  ];
+  quantities = {}; openCards = {};
+  rooms.forEach(r => r.items.forEach(i => { quantities[i.id] = ''; openCards[i.id] = false; }));
+  projectName = ''; notes = ''; copied = false; customRoomInput = '';
 }
 initState();
 
+// ── RENDER ROOT ───────────────────────────────────────────────────────
 function render() {
   const app = document.getElementById('app');
   app.innerHTML = `
@@ -281,13 +237,13 @@ function render() {
         <h1>Tile Order Builder</h1>
         <p>Wilde Holdings — Material Order</p>
       </div>
-      <div class="phase-badge">${phase === 'setup' ? 'SETUP' : phase === 'order' ? 'ORDER' : 'SUMMARY'}</div>
+      <div class="phase-badge">${phase==='setup'?'SETUP':phase==='order'?'ORDER':'SUMMARY'}</div>
     </div>
     <div class="phase-tabs">
       <button class="phase-tab ${phase==='setup'?'active':(phase==='order'||phase==='summary')?'done':'inactive'}"
-        onclick="if(phase!=='setup'){phase='setup';render();window.scrollTo(0,0)}">1 · Configure SKUs</button>
+        onclick="if(phase!=='setup'){phase='setup';render();scrollTo(0,0)}">1 · Configure</button>
       <button class="phase-tab ${phase==='order'?'active':phase==='summary'?'done':'inactive'}"
-        onclick="if(phase==='summary'){phase='order';render();window.scrollTo(0,0)}">2 · Enter Quantities</button>
+        onclick="if(phase==='summary'){phase='order';render();scrollTo(0,0)}">2 · Quantities</button>
       <button class="phase-tab ${phase==='summary'?'active':'inactive'}">3 · Summary</button>
     </div>
   `;
@@ -296,71 +252,131 @@ function render() {
   else renderSummary(app);
 }
 
+// ── PHASE 1: SETUP ────────────────────────────────────────────────────
 function renderSetup(app) {
   let html = `
     <div class="step-header">
       <div class="step-label">PHASE 1 — PROJECT SETUP</div>
       <div class="step-title">Configure This Job</div>
-      <div class="step-sub">Edit product name, description, and SKU for each item. Skip anything not needed on this job.</div>
+      <div class="step-sub">Add or remove rooms, rename them, then edit SKUs for each item.</div>
     </div>
     <div class="note-box">
       <label>Project / Address</label>
       <input type="text" placeholder="e.g. 501 S 24th St Broken Arrow" value="${projectName}" oninput="projectName=this.value" />
     </div>
   `;
-  rooms.forEach(room => {
-    html += `<div class="room-header">${room.name}</div>`;
-    room.items.forEach(item => {
-      const e = edits[item.id];
+
+  // Add room bar
+  html += `<div class="add-room-bar">
+    <div class="add-room-presets">
+      ${Object.keys(ROOM_PRESETS).map(name => `
+        <button class="preset-btn" onclick="addRoom('${name.replace(/'/g,"\\'")}')">+ ${name}</button>
+      `).join('')}
+    </div>
+  </div>
+  <div class="add-room-bar" style="margin-top:-10px;margin-bottom:20px">
+    <input class="custom-room-input" id="custom-room-input" type="text" placeholder="Custom room name..." value="${customRoomInput}"
+      oninput="customRoomInput=this.value"
+      onkeydown="if(event.key==='Enter')addCustomRoom()" />
+    <button class="add-custom-btn" onclick="addCustomRoom()">+ Add</button>
+  </div>`;
+
+  // Rooms
+  rooms.forEach((room, ri) => {
+    html += `
+      <div class="room-block">
+        <div class="room-block-header">
+          <input class="room-name-input" type="text" placeholder="Room name..." value="${room.name.replace(/"/g,'&quot;')}"
+            oninput="rooms[${ri}].name=this.value" />
+          <button class="room-delete-btn" onclick="deleteRoom(${ri})">Remove Room</button>
+        </div>
+        <div class="room-items">
+    `;
+    room.items.forEach((item, ii) => {
       const isOpen = openCards[item.id];
-      const hasSku = e.sku.trim() !== '';
+      const hasSku = item.sku.trim() !== '';
       html += `
         <div class="setup-card">
           <div class="setup-card-header" onclick="openCards['${item.id}']=!openCards['${item.id}'];render()">
             <span class="setup-card-label">${item.label}</span>
             <div style="display:flex;align-items:center;gap:8px">
-              <span class="setup-card-sku ${e.skipped?'skipped-badge':hasSku?'filled':''}">${e.skipped?'SKIP':hasSku?e.sku:'NO SKU'}</span>
+              <span class="setup-card-sku ${item.skipped?'skipped-badge':hasSku?'filled':''}">${item.skipped?'SKIP':hasSku?item.sku:'NO SKU'}</span>
               <span class="setup-card-toggle ${isOpen?'open':''}">▶</span>
             </div>
           </div>
           <div class="setup-card-body ${isOpen?'open':''}">
-            <div class="${e.skipped?'skipped-overlay':''}">
+            <div class="${item.skipped?'skipped-overlay':''}">
               <div class="field-row">
                 <div class="field-group">
                   <span class="field-label">Product Name</span>
-                  <input class="field-input ${e.name?'has-value':''}" type="text" placeholder="Product name"
-                    value="${e.name.replace(/"/g,'&quot;')}"
-                    oninput="edits['${item.id}'].name=this.value" />
+                  <input class="field-input ${item.name?'has-value':''}" type="text" placeholder="Product name"
+                    value="${item.name.replace(/"/g,'&quot;')}"
+                    oninput="rooms[${ri}].items[${ii}].name=this.value" />
                 </div>
               </div>
               <div class="field-row">
                 <div class="field-group">
                   <span class="field-label">Description / Color</span>
-                  <input class="field-input ${e.desc?'has-value':''}" type="text" placeholder="e.g. Matte black, vertical stack"
-                    value="${e.desc.replace(/"/g,'&quot;')}"
-                    oninput="edits['${item.id}'].desc=this.value" />
+                  <input class="field-input ${item.desc?'has-value':''}" type="text" placeholder="e.g. Matte black, vertical stack"
+                    value="${item.desc.replace(/"/g,'&quot;')}"
+                    oninput="rooms[${ri}].items[${ii}].desc=this.value" />
                 </div>
                 <div class="field-group sku-field">
                   <span class="field-label">SKU <span class="req">*</span></span>
-                  <input class="field-input mono ${e.sku?'has-value':''}" type="text" placeholder="Required"
-                    value="${e.sku}"
-                    oninput="edits['${item.id}'].sku=this.value" />
+                  <input class="field-input mono ${item.sku?'has-value':''}" type="text" placeholder="Required"
+                    value="${item.sku}"
+                    oninput="rooms[${ri}].items[${ii}].sku=this.value" />
                 </div>
               </div>
             </div>
             <div class="skip-toggle">
-              <input type="checkbox" id="skip-${item.id}" ${e.skipped?'checked':''} onchange="edits['${item.id}'].skipped=this.checked;render()" />
+              <input type="checkbox" id="skip-${item.id}" ${item.skipped?'checked':''}
+                onchange="rooms[${ri}].items[${ii}].skipped=this.checked;render()" />
               <label for="skip-${item.id}">Skip this item for this project</label>
             </div>
           </div>
         </div>
       `;
     });
+    html += `</div></div>`; // close room-items, room-block
   });
-  html += `<div class="nav"><div></div><button class="btn btn-next" onclick="phase='order';render();window.scrollTo(0,0)">Start Order →</button></div>`;
+
+  if (rooms.length === 0) {
+    html += `<div class="empty-state">No rooms yet. Add one above.</div>`;
+  }
+
+  html += `<div class="nav"><div></div><button class="btn btn-next" onclick="phase='order';render();scrollTo(0,0)">Start Order →</button></div>`;
   app.insertAdjacentHTML('beforeend', html);
 }
 
+function addRoom(name) {
+  const tplKeys = ROOM_PRESETS[name] || ['floor_tile','floor_grout'];
+  const room = makeRoom(name, tplKeys);
+  rooms.push(room);
+  render();
+}
+
+function addCustomRoom() {
+  const name = customRoomInput.trim();
+  if (!name) return;
+  // Pick a sensible default template set based on keywords
+  let tplKeys = ['floor_tile','floor_grout'];
+  const lower = name.toLowerCase();
+  if (lower.includes('bath')) tplKeys = ROOM_PRESETS['Hall Bathroom'];
+  else if (lower.includes('kitchen')) tplKeys = ROOM_PRESETS['Kitchen'];
+  const room = makeRoom(name, tplKeys);
+  rooms.push(room);
+  customRoomInput = '';
+  render();
+}
+
+function deleteRoom(ri) {
+  if (!confirm('Remove "' + rooms[ri].name + '"?')) return;
+  rooms.splice(ri, 1);
+  render();
+}
+
+// ── PHASE 2: ORDER ────────────────────────────────────────────────────
 function renderOrder(app) {
   let html = `
     <div class="step-header">
@@ -369,22 +385,22 @@ function renderOrder(app) {
       <div class="step-sub">Fill in what you need. Skipped items are excluded.</div>
     </div>
   `;
+
   rooms.forEach(room => {
-    const active = room.items.filter(i => !edits[i.id].skipped);
+    const active = room.items.filter(i => !i.skipped);
     if (!active.length) return;
-    html += `<div class="room-header">${room.name}</div>`;
+    html += `<div class="order-room-header"><span class="order-room-name">${room.name}</span></div>`;
     active.forEach(item => {
-      const e = edits[item.id];
-      const qty = quantities[item.id];
+      const qty = quantities[item.id] || '';
       const unitLabel = item.unit === 'sqft' ? 'Sq Ft' : item.unit === 'bags' ? 'Bags' : 'Pieces';
       html += `
         <div class="order-card">
           <div class="order-card-header">
             <div>
               <div class="order-item-label">${item.label}</div>
-              <div class="order-item-name">${e.name}${e.desc?' — '+e.desc:''}</div>
+              <div class="order-item-name">${item.name}${item.desc?' — '+item.desc:''}</div>
             </div>
-            <div class="order-sku-badge">SKU: ${e.sku||'—'}</div>
+            <div class="order-sku-badge">SKU: ${item.sku||'—'}</div>
           </div>
           <div class="order-controls">
             <span class="qty-label">${unitLabel}:</span>
@@ -395,30 +411,34 @@ function renderOrder(app) {
       `;
     });
   });
+
+  if (rooms.length === 0) html += `<div class="empty-state">No rooms configured. Go back and add some.</div>`;
+
   html += `
     <div class="nav">
-      <button class="btn btn-back" onclick="phase='setup';render();window.scrollTo(0,0)">← Back</button>
-      <button class="btn btn-next" onclick="phase='summary';render();window.scrollTo(0,0)">Review Order →</button>
+      <button class="btn btn-back" onclick="phase='setup';render();scrollTo(0,0)">← Back</button>
+      <button class="btn btn-next" onclick="phase='summary';render();scrollTo(0,0)">Review Order →</button>
     </div>
   `;
   app.insertAdjacentHTML('beforeend', html);
 }
 
+// ── PHASE 3: SUMMARY ─────────────────────────────────────────────────
 function renderSummary(app) {
   let hasItems = false;
-  let summaryRows = '';
+  let rows = '';
+
   rooms.forEach(room => {
-    const orderItems = room.items.filter(i => !edits[i.id].skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
+    const orderItems = room.items.filter(i => !i.skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
     if (!orderItems.length) return;
     hasItems = true;
-    summaryRows += `<div class="summary-room">${room.name}</div>`;
+    rows += `<div class="summary-room">${room.name}</div>`;
     orderItems.forEach(item => {
-      const e = edits[item.id];
-      summaryRows += `
+      rows += `
         <div class="summary-row">
           <div>
-            <div class="summary-item-name">${item.label} — ${e.name}</div>
-            <div class="summary-item-sku">SKU: ${e.sku}${e.desc?' · '+e.desc:''}</div>
+            <div class="summary-item-name">${item.label} — ${item.name}</div>
+            <div class="summary-item-sku">SKU: ${item.sku}${item.desc?' · '+item.desc:''}</div>
           </div>
           <div class="summary-qty">${quantities[item.id]} ${item.unit}</div>
         </div>
@@ -436,39 +456,38 @@ function renderSummary(app) {
       <label>Project / Address</label>
       <input type="text" placeholder="e.g. 501 S 24th St Broken Arrow" value="${projectName}" oninput="projectName=this.value" />
     </div>
-    ${hasItems ? summaryRows : '<div class="empty-state">No items with quantities entered.<br>Go back and add some.</div>'}
+    ${hasItems ? rows : '<div class="empty-state">No items with quantities entered. Go back and add some.</div>'}
     <div class="note-box" style="margin-top:16px">
       <label>Notes for Rep</label>
       <textarea rows="3" placeholder="Any special instructions..." oninput="notes=this.value">${notes}</textarea>
     </div>
     <div class="nav" style="margin-top:0">
-      <button class="btn btn-back" onclick="phase='order';render();window.scrollTo(0,0)">← Edit</button>
+      <button class="btn btn-back" onclick="phase='order';render();scrollTo(0,0)">← Edit</button>
       <div></div>
     </div>
     ${hasItems ? `
       <div class="action-row">
         <button class="copy-btn ${copied?'copied':''}" onclick="copyOrder()">${copied?'✓ Copied':'Copy Text'}</button>
         <button class="pdf-btn" onclick="generatePDF()">⬇ Download PDF</button>
-      </div>
-    ` : ''}
+      </div>` : ''}
     <button class="restart-btn" onclick="restartAll()">Start New Order</button>
   `;
   app.insertAdjacentHTML('beforeend', html);
 }
 
+// ── COPY ──────────────────────────────────────────────────────────────
 function copyOrder() {
   const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   const lines = ['WILDE HOLDINGS — TILE ORDER'];
   if (projectName) lines.push('PROJECT: ' + projectName);
   lines.push('DATE: ' + date, '');
   rooms.forEach(room => {
-    const items = room.items.filter(i => !edits[i.id].skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
+    const items = room.items.filter(i => !i.skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
     if (!items.length) return;
     lines.push('── ' + room.name.toUpperCase() + ' ──');
-    items.forEach(item => {
-      const e = edits[item.id];
-      lines.push(item.label + ': ' + e.name + (e.desc ? ' (' + e.desc + ')' : ''));
-      lines.push('  SKU: ' + e.sku + '  |  Qty: ' + quantities[item.id] + ' ' + item.unit);
+    items.forEach(i => {
+      lines.push(i.label + ': ' + i.name + (i.desc ? ' (' + i.desc + ')' : ''));
+      lines.push('  SKU: ' + i.sku + '  |  Qty: ' + quantities[i.id] + ' ' + i.unit);
     });
     lines.push('');
   });
@@ -483,41 +502,34 @@ function copyOrder() {
   setTimeout(() => { copied = false; render(); }, 3000);
 }
 
+// ── PDF ───────────────────────────────────────────────────────────────
 function generatePDF() {
-  const date     = new Date().toLocaleDateString('en-US', { month: 'long',  day: 'numeric', year: 'numeric' });
-  const dateShort= new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const date      = new Date().toLocaleDateString('en-US', { month: 'long',  day: 'numeric', year: 'numeric' });
+  const dateShort = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   const unitLabel = u => u === 'sqft' ? 'sq ft' : u === 'bags' ? 'bags' : 'pcs';
 
   let roomsHtml = '';
   rooms.forEach(room => {
-    const items = room.items.filter(i => !edits[i.id].skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
+    const items = room.items.filter(i => !i.skipped && quantities[i.id] !== '' && Number(quantities[i.id]) > 0);
     if (!items.length) return;
     roomsHtml += `<div class="pf-room-label">${room.name}</div>`;
     roomsHtml += `
       <table class="pf-table">
-        <thead>
-          <tr>
-            <th style="width:26%">Item</th>
-            <th style="width:36%">Product</th>
-            <th style="width:18%">SKU</th>
-            <th class="r" style="width:20%">Qty</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th style="width:26%">Item</th>
+          <th style="width:36%">Product</th>
+          <th style="width:18%">SKU</th>
+          <th class="r" style="width:20%">Qty</th>
+        </tr></thead>
         <tbody>
-          ${items.map((item, idx) => {
-            const e = edits[item.id];
-            return `
-              <tr class="${idx % 2 === 1 ? 'even' : ''}">
-                <td><div class="pf-item-label">${item.label}</div></td>
-                <td>
-                  <div>${e.name}</div>
-                  ${e.desc ? `<div class="pf-item-desc">${e.desc}</div>` : ''}
-                </td>
-                <td><span class="pf-sku">${e.sku}</span></td>
-                <td class="pf-qty">${quantities[item.id]} <span class="pf-unit">${unitLabel(item.unit)}</span></td>
-              </tr>
-            `;
-          }).join('')}
+          ${items.map((item, idx) => `
+            <tr class="${idx%2===1?'even':''}">
+              <td><div class="pf-item-label">${item.label}</div></td>
+              <td><div>${item.name}</div>${item.desc?`<div class="pf-item-desc">${item.desc}</div>`:''}</td>
+              <td><span class="pf-sku">${item.sku}</span></td>
+              <td class="pf-qty">${quantities[item.id]} <span class="pf-unit">${unitLabel(item.unit)}</span></td>
+            </tr>
+          `).join('')}
         </tbody>
       </table>
     `;
@@ -534,32 +546,27 @@ function generatePDF() {
         <div class="pf-meta-value">${date}</div>
       </div>
     </div>
-    ${projectName ? `
-      <div class="pf-project">
-        <div class="pf-project-label">Project</div>
-        <div class="pf-project-name">${projectName}</div>
-      </div>` : ''}
+    ${projectName?`<div class="pf-project"><div class="pf-project-label">Project</div><div class="pf-project-name">${projectName}</div></div>`:''}
     ${roomsHtml}
-    ${notes.trim() ? `
-      <div class="pf-notes">
-        <div class="pf-notes-label">Notes</div>
-        <div class="pf-notes-text">${notes.trim()}</div>
-      </div>` : ''}
+    ${notes.trim()?`<div class="pf-notes"><div class="pf-notes-label">Notes</div><div class="pf-notes-text">${notes.trim()}</div></div>`:''}
     <div class="pf-footer">
       <span>Wilde Holdings, LLC — Tile Order</span>
-      <span>${dateShort}${projectName ? ' · ' + projectName : ''}</span>
+      <span>${dateShort}${projectName?' · '+projectName:''}</span>
     </div>
   `;
 
   const oldTitle = document.title;
-  document.title = 'Tile Order' + (projectName ? ' — ' + projectName : '') + ' — ' + dateShort;
+  document.title = 'Tile Order' + (projectName?' — '+projectName:'') + ' — ' + dateShort;
   window.print();
   setTimeout(() => { document.title = oldTitle; }, 1500);
 }
 
+// ── RESTART ───────────────────────────────────────────────────────────
 function restartAll() {
-  projectName = ''; notes = ''; copied = false; phase = 'setup';
-  initState(); render(); window.scrollTo(0,0);
+  _nextId = 1;
+  initState();
+  render();
+  scrollTo(0,0);
 }
 
 render();
